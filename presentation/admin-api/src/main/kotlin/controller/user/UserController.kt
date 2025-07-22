@@ -13,23 +13,23 @@ import service.user.UserService
 class UserController(private val userService: UserService) {
     //register user
     @PostMapping("auth/register")
-    suspend fun register(@RequestBody request: CreateUserRequest) = userService.userRegister(request)
+    fun register(@RequestBody request: CreateUserRequest) = userService.userRegister(request)
 
     //login user
     @PostMapping("auth/login")
-    suspend fun login(@RequestBody request: LoginRequest) = userService.adminLogin(request)
+    fun login(@RequestBody request: LoginRequest) = userService.adminLogin(request)
 
     //get me
     @GetMapping("me")
-    suspend fun getMe() = userService.getMe()
+    fun getMe() = userService.getMe()
 
     //update user
     @PutMapping("user")
-    suspend fun updateUser(@RequestBody request: UpdateUserRequest) = userService.updateUser(request)
+    fun updateUser(@RequestBody request: UpdateUserRequest) = userService.updateUser(request)
 
     //get all users
     @GetMapping("users")
-    suspend fun getAllUser(
+    fun getAllUser(
         @RequestParam(defaultValue = "1") pageNumber: Int,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam("searchString") searchString: String?

@@ -19,10 +19,11 @@
         <module>presentation/user-api</module>
         <module>presentation/admin-api</module>
         <module>share/shared</module>
-        <module>infrastructure/persistence</module>
         <module>domain/domain</module>
         <module>core/application</module>
         <module>infrastructure/external</module>
+        <module>infrastructure/persistence</module>
+        <module>infrastructure/security</module>
     </modules>
 
     <dependencyManagement>

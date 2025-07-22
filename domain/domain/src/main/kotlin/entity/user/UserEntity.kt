@@ -16,8 +16,8 @@ class UserEntity(
     @Column(name = "name")
     var name: String,
 
-    @Column(name = "user_name", unique = true, nullable = false)
-    val userName: String,
+    @Column(unique = true, nullable = false)
+    val username: String,
 
     @Column(nullable = false)
     var passwordHash: String,
@@ -64,7 +64,7 @@ class UserEntity(
 
     constructor() : this(
         name = "",
-        userName = "",
+        username = "",
         passwordHash = "",
         email = "",
         phone = "",

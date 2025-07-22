@@ -11,13 +11,13 @@ import wrapper.ApiResult
 import wrapper.PaginatedResult
 
 interface UserService {
-    suspend fun getAllUsers(pageNumber: Int, pageSize: Int, searchString: String?): PaginatedResult<UserResponse>
-    suspend fun getUserById(id: String): ApiResult<UserDetailResponse>
-    suspend fun getMe(): ApiResult<UserResponse>
-    suspend fun getUserInfo(phone: String): ApiResult<UserResponse>
-    suspend fun updateUser(request: UpdateUserRequest): ApiResult<String>
-    suspend fun userRegister(request: CreateUserRequest): ApiResult<UserTokenResponse>
-    suspend fun deviceLogin(request: LoginRequest): ApiResult<UserTokenResponse>
-    suspend fun adminLogin(request: LoginRequest): ApiResult<UserTokenResponse>
-    suspend fun changePassword(request: UserChangePasswordRequest): ApiResult<String>
+    fun getAllUsers(pageNumber: Int, pageSize: Int, searchString: String?): PaginatedResult<UserResponse>
+    fun getUserById(id: String): ApiResult<UserDetailResponse>
+    fun getMe(): ApiResult<UserResponse>
+    fun getUserInfo(phone: String): ApiResult<UserResponse>
+    fun updateUser(request: UpdateUserRequest): ApiResult<String>
+    fun userRegister(request: CreateUserRequest): ApiResult<UserTokenResponse>
+    fun deviceLogin(request: LoginRequest): ApiResult<UserTokenResponse>
+    fun adminLogin(request: LoginRequest): ApiResult<UserTokenResponse>
+    fun changePassword(request: UserChangePasswordRequest): ApiResult<String>
 }

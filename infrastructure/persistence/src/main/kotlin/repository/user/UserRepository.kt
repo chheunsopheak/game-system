@@ -6,10 +6,10 @@ import repository.base.BaseRepository
 
 @Repository
 interface UserRepository : BaseRepository<UserEntity, String> {
-    fun findByUserName(userName: String): UserEntity?
+    fun findByUsername(username: String): UserEntity?
     fun findByEmail(email: String): UserEntity?
     fun findByPhone(phone: String): UserEntity?
-    fun existsByUserName(userName: String): Boolean
+    fun existsByUsername(username: String): Boolean
     fun existsByEmail(email: String): Boolean
     fun existsByPhone(phone: String): Boolean
 }

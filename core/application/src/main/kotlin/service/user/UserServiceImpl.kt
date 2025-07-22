@@ -4,8 +4,6 @@ import constant.SecurityConstant
 import entity.user.UserEntity
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import repository.device.DeviceRepository
@@ -17,7 +15,7 @@ import request.user.UserChangePasswordRequest
 import response.user.UserDetailResponse
 import response.user.UserResponse
 import response.user.UserTokenResponse
-import service.token.JwtService
+import service.token.TokenService
 import specification.user.UserFilterSpecification
 import wrapper.ApiResult
 import wrapper.PaginatedResult
@@ -27,10 +25,10 @@ import java.time.LocalDateTime
 class UserServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtService: JwtService,
+    private val tokenService: TokenService,
     private val deviceRepository: DeviceRepository
 ) : UserService {
-    override suspend fun getAllUsers(
+    override fun getAllUsers(
         pageNumber: Int,
         pageSize: Int,
         searchString: String?
@@ -50,7 +48,7 @@ class UserServiceImpl(
     }
 
 
-    override suspend fun getUserById(id: String): ApiResult<UserDetailResponse> {
+    override fun getUserById(id: String): ApiResult<UserDetailResponse> {
         val user = userRepository.findById(id)
         if (user.isEmpty)
             return ApiResult.failed(HttpStatus.NOT_EXTENDED, "User with id $id not found")
@@ -58,39 +56,32 @@ class UserServiceImpl(
         return ApiResult.success(data, "User retrieved successfully")
     }
 
-    override suspend fun getMe(): ApiResult<UserResponse> {
-        val auth = SecurityContextHolder.getContext().authentication
-        val principal = auth.principal
-
-        // Assuming CustomUserDetailsService returns UserEntity or implements UserDetails
-        val user: UserEntity = when (principal) {
-            is UserEntity -> principal
-            is UserDetails -> userRepository.findByUserName(principal.username)
-                ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
-
-            else -> return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Invalid principal type")
-        }
+    override fun getMe(): ApiResult<UserResponse> {
+        val userId = tokenService.getCurrentUserId()
+        val user = userRepository.findById(userId)
+            ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
+        val userData = user.get()
         return ApiResult.success(
             UserResponse(
-                id = user.id,
-                name = user.name,
-                email = user.email,
-                phone = user.phone,
-                photo = user.photo,
-                username = user.userName,
-                isActive = user.isActive,
-                energy = user.energy,
+                id = userData.id,
+                name = userData.name,
+                email = userData.email,
+                phone = userData.phone,
+                photo = userData.photo,
+                username = userData.username,
+                isActive = userData.isActive,
+                energy = userData.energy,
             ),
             "User retrieved successfully"
         )
     }
 
-    override suspend fun getUserInfo(phone: String): ApiResult<UserResponse> {
+    override fun getUserInfo(phone: String): ApiResult<UserResponse> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateUser(request: UpdateUserRequest): ApiResult<String> {
-        val userId = jwtService.getCurrentUser()
+    override fun updateUser(request: UpdateUserRequest): ApiResult<String> {
+        val userId = tokenService.getCurrentUserId()
         val user = userRepository.findById(userId)
             ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
         val requestUpdate = user.get()
@@ -105,18 +96,18 @@ class UserServiceImpl(
         return ApiResult.success(updatedUser.id, "User updated successfully")
     }
 
-    override suspend fun userRegister(request: CreateUserRequest): ApiResult<UserTokenResponse> {
+    override fun userRegister(request: CreateUserRequest): ApiResult<UserTokenResponse> {
         if (userRepository.existsByEmail(request.email)) {
             return ApiResult.error(HttpStatus.CONFLICT, "User already exists")
         }
         if (userRepository.existsByPhone(request.phone)) {
             return ApiResult.error(HttpStatus.CONFLICT, "Phone number already exists")
         }
-        if (userRepository.findByUserName(request.username) != null) {
+        if (userRepository.findByUsername(request.username) != null) {
             return ApiResult.error(HttpStatus.CONFLICT, "This ${request.username} already taken")
         }
         val newUser = UserEntity(
-            userName = request.username,
+            username = request.username,
             email = request.email,
             passwordHash = passwordEncoder.encode(request.password),
             name = request.name,
@@ -128,7 +119,7 @@ class UserServiceImpl(
         )
 
         val savedUser = userRepository.save(newUser)
-        val userToken = jwtService.generateAccessToken(savedUser)
+        val userToken = tokenService.generateToken(savedUser.id)
 
         return ApiResult.success(
             UserTokenResponse(
@@ -142,8 +133,8 @@ class UserServiceImpl(
         )
     }
 
-    override suspend fun deviceLogin(request: LoginRequest): ApiResult<UserTokenResponse> {
-        val user = userRepository.findByUserName(request.username)
+    override fun deviceLogin(request: LoginRequest): ApiResult<UserTokenResponse> {
+        val user = userRepository.findByUsername(request.username)
             ?: userRepository.findByEmail(request.username)
             ?: userRepository.findByPhone(request.username)
             ?: return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Invalid username or password")
@@ -166,7 +157,7 @@ class UserServiceImpl(
         user.lastLogin = LocalDateTime.now()
         userRepository.save(user)
 
-        val userToken = jwtService.generateAccessToken(user)
+        val userToken = tokenService.generateToken(user.id)
 
         val response = UserTokenResponse(
             userId = user.id,
@@ -179,11 +170,11 @@ class UserServiceImpl(
         return ApiResult.success(response, "User logged in successfully")
     }
 
-    override suspend fun adminLogin(request: LoginRequest): ApiResult<UserTokenResponse> {
-        val user = userRepository.findByUserName(request.username)
+    override fun adminLogin(request: LoginRequest): ApiResult<UserTokenResponse> {
+        val user = userRepository.findByUsername(request.username)
             ?: userRepository.findByEmail(request.username)
             ?: userRepository.findByPhone(request.username)
-            ?: return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Invalid username or password")
+            ?: return ApiResult.failed(HttpStatus.BAD_REQUEST, "User not found")
 
         if (!user.isActive) {
             return ApiResult.failed(HttpStatus.UNAUTHORIZED, "User is not active")
@@ -192,25 +183,27 @@ class UserServiceImpl(
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
             return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Invalid username or password")
         }
+        if (passwordEncoder.matches(request.password, user.passwordHash)) {
+            user.lastLogin = LocalDateTime.now()
+            userRepository.save(user)
 
-        user.lastLogin = LocalDateTime.now()
-        userRepository.save(user)
+            val userToken = tokenService.generateToken(user.id)
 
-        val userToken = jwtService.generateAccessToken(user)
+            val response = UserTokenResponse(
+                userId = user.id,
+                accessToken = userToken.token,
+                tokenType = SecurityConstant.TOKEN_PREFIX.trim(),
+                expiresIn = userToken.expiresIn,
+                role = if (user.role == 2) "ADMIN" else "USER"
+            )
 
-        val response = UserTokenResponse(
-            userId = user.id,
-            accessToken = userToken.token,
-            tokenType = SecurityConstant.TOKEN_PREFIX.trim(),
-            expiresIn = userToken.expiresIn,
-            role = if (user.role == 2) "ADMIN" else "USER"
-        )
-
-        return ApiResult.success(response, "User logged in successfully")
+            return ApiResult.success(response, "User logged in successfully")
+        }
+        return ApiResult.failed(HttpStatus.UNAUTHORIZED, "No permission for access the resource")
     }
 
-    override suspend fun changePassword(request: UserChangePasswordRequest): ApiResult<String> {
-        val userId = jwtService.getCurrentUser()
+    override fun changePassword(request: UserChangePasswordRequest): ApiResult<String> {
+        val userId = tokenService.getCurrentUserId()
         val user = userRepository.findById(userId)
             ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
 

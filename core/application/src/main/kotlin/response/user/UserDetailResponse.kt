@@ -15,7 +15,7 @@ class UserDetailResponse(
     companion object {
         fun from(user: UserEntity): UserDetailResponse = UserDetailResponse(
             id = user.id,
-            username = user.userName,
+            username = user.username,
             email = user.email,
             name = user.name,
             isActive = user.isActive,

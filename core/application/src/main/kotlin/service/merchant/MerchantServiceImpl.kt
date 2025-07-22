@@ -20,7 +20,7 @@ import response.merchant.MerchantDetailResponse
 import response.merchant.MerchantLoginResponse
 import response.merchant.MerchantResponse
 import response.merchant.MyMerchantResponse
-import service.token.JwtService
+import service.token.TokenService
 import service.user.UserService
 import specification.merchant.MerchantFilterSpecification
 import wrapper.ApiResult
@@ -34,12 +34,12 @@ class MerchantServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val storeRepository: StoreRepository,
     private val userService: UserService,
-    private val jwtService: JwtService
+    private val tokenService: TokenService
 ) : MerchantService {
     override suspend fun merchantLogin(request: LoginRequest): ApiResult<MerchantLoginResponse> {
         val user = userRepository.findByPhone(request.username)
             ?: userRepository.findByEmail(request.username)
-            ?: userRepository.findByUserName(request.username)
+            ?: userRepository.findByUsername(request.username)
         if (user == null) {
             return ApiResult.notFound("User not found")
         }
@@ -147,7 +147,7 @@ class MerchantServiceImpl(
         }
         val saveUser = userRepository.save(user.get())
 
-        val userToken = jwtService.generateAccessToken(saveUser)
+        val userToken = tokenService.generateToken(saveUser.id)
 
         val data = MerchantLoginResponse(
             userId = saveUser.id,
@@ -194,7 +194,7 @@ class MerchantServiceImpl(
         }
 
         val userRequest = UserEntity(
-            userName = (request.email.takeIf { it.isNotBlank() }?.split("@")?.getOrNull(0)
+            username = (request.email.takeIf { it.isNotBlank() }?.split("@")?.getOrNull(0)
                 ?: request.phone),
             email = request.email,
             passwordHash = passwordEncoder.encode(request.password),
