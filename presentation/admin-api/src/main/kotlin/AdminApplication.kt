@@ -3,11 +3,20 @@ package com.gamesystem
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
-@SpringBootApplication
-@EnableJpaAuditing
+@SpringBootApplication(
+    scanBasePackages = [
+        "com.gamesystem",
+        "service",
+        "config",
+        "user",
+        "filter",
+        "jwt",
+        "auth",
+        "network",
+    ]
+)
 @EntityScan("entity")
 @EnableJpaRepositories("repository")
 class AdminApplication

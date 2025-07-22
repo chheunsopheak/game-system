@@ -19,12 +19,12 @@ abstract class BaseEntity {
         protected set
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false, insertable = true, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     lateinit var createdAt: LocalDateTime
         protected set
 
     @LastModifiedDate
-    @Column(name = "updated_at", nullable = true, insertable = false, updatable = true)
+    @Column(name = "updated_at", nullable = true)
     lateinit var updatedAt: LocalDateTime
         protected set
 

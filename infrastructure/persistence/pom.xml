@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>persistence</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,6 +50,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Optional: Avoid spring-boot-maven-plugin errors -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>

@@ -5,8 +5,18 @@ import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
-//@SpringBootApplication
-@SpringBootApplication(scanBasePackages = ["com.gamesystem", "service"])
+@SpringBootApplication(
+    scanBasePackages = [
+        "com.gamesystem",
+        "service",
+        "config",
+        "user",
+        "filter",
+        "jwt",
+        "auth",
+        "network",
+    ]
+)
 @EntityScan("entity")
 @EnableJpaRepositories("repository")
 class UserApplication

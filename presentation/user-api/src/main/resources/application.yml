@@ -1,21 +1,14 @@
 server:
-  port: 8001
-
+  port: 5002
 spring:
   application:
-    name: user-api
-
+    name: game
   output:
-    ansi:
-      enabled: ALWAYS
-
-  profiles:
-    active: dev
-
+    ansi.enabled: ALWAYS
   datasource:
-    url: jdbc:mysql://localhost:3306/game_system_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://68.183.177.52:3306/game_hub_development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: Admin@1111
+    password: GameHub@2025
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: true

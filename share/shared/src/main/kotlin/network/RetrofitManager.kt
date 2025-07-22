@@ -33,7 +33,7 @@ class RetrofitManager() {
         .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
         .build()
 
-    fun <T> createClientService(baseUrl: String, service: Class<T>): T {
+    fun <T> createClient(baseUrl: String, service: Class<T>): T {
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(okHttpClient)

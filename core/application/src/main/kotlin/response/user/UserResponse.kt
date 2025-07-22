@@ -1,26 +1,27 @@
 package response.user
 
 import entity.user.UserEntity
-import java.time.LocalDateTime
 
 data class UserResponse(
     val id: String,
     val username: String,
     val email: String,
     val name: String,
+    val photo: String?,
+    val phone: String?,
     val isActive: Boolean,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    var energy: Int?
 ) {
     companion object {
         fun from(user: UserEntity): UserResponse = UserResponse(
             id = user.id,
-            username = user.username,
+            username = user.userName,
             email = user.email,
             name = user.name,
             isActive = user.isActive,
-            createdAt = user.createdAt,
-            updatedAt = user.updatedAt
+            photo = user.photo,
+            phone = user.phone,
+            energy = user.energy
         )
     }
 }
