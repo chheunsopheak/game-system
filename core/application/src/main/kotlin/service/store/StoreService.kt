@@ -8,13 +8,11 @@ import wrapper.ApiResult
 import wrapper.PaginatedResult
 
 interface StoreService {
-    suspend fun myStore(storeId: String): ApiResult<MyStoreResponse>
-    suspend fun createStore(request: StoreRequest): ApiResult<String>
-    suspend fun updatedStore(id: String, request: StoreRequest): ApiResult<String>
-    suspend fun getStoreById(id: String): ApiResult<StoreDetailResponse>
-    suspend fun getAll(pageNumber: Int, pageSize: Int, searchString: String?): PaginatedResult<StoreResponse>
-    suspend fun deleteStoreById(id: String): ApiResult<String>
-    suspend fun getAllStoreByMerchantId(
-        merchantId: String
-    ): ApiResult<List<StoreDetailResponse>>
+    fun myStore(storeId: String): ApiResult<MyStoreResponse>
+    fun createStore(request: StoreRequest): ApiResult<String>
+    fun updatedStore(id: String, request: StoreRequest): ApiResult<String>
+    fun getStoreById(id: String): ApiResult<StoreDetailResponse>
+    fun getAll(pageNumber: Int, pageSize: Int, searchString: String?): PaginatedResult<StoreResponse>
+    fun deleteStoreById(id: String): ApiResult<String>
+    fun getAllStoreByMerchantId(merchantId: String): ApiResult<List<StoreDetailResponse>>
 }

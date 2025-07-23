@@ -47,7 +47,7 @@ class GameHistoryServiceImpl(
     override fun createUserGamePlay(request: GameHistoryRequest): ApiResult<String> {
         val user = userRepository.findById(request.userId)
         if (user.isEmpty) {
-            return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
+            return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "User not found")
         }
 
         val gameEntity = request.gameId?.let { gameRepository.findById(it).orElse(null) }
@@ -69,7 +69,7 @@ class GameHistoryServiceImpl(
     override fun countUserGamePlay(gameId: String?, userId: String): ApiResult<String> {
         val user = userRepository.findById(userId)
         if (user.isEmpty) {
-            return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
+            return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "User not found")
         }
 
         val today = LocalDate.now()

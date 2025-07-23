@@ -24,7 +24,7 @@ class CustomerServiceImpl(
 ) : CustomerService {
     override suspend fun sendCodeCustomer(request: CustomerSendRequest): ApiResult<String> {
         val token = authClient.getToken()
-        if (token.statusCode != HttpStatus.OK) {
+        if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = token.statusCode,
                 message = "Failed to get token: ${token.message}"
@@ -34,16 +34,16 @@ class CustomerServiceImpl(
             token.data.toString(),
             UserClientSendRequest(phone = request.phone)
         )
-        return if (data.response.status == HttpStatus.OK) {
+        return if (data.response.status.value() == HttpStatus.OK.value()) {
             ApiResult.success("", data.response.message)
         } else {
-            ApiResult.failed(HttpStatus.FAILED_DEPENDENCY, data.response.message)
+            ApiResult.failed(HttpStatus.FAILED_DEPENDENCY.value(), data.response.message)
         }
     }
 
     override suspend fun verifyCodeCustomer(request: CustomerVerifyRequest): ApiResult<CustomerVerifyResponse> {
         val token = authClient.getToken()
-        if (token.statusCode != HttpStatus.OK) {
+        if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = token.statusCode,
                 message = "Failed to get token: ${token.message}"
@@ -51,11 +51,11 @@ class CustomerServiceImpl(
         }
         val requestVerify = UserClientVerifyRequest(code = request.code, phone = request.phone)
         val data = userClientService.verifyCode(token.data.toString(), requestVerify)
-        return if (data.response.status == HttpStatus.OK) {
+        return if (data.response.status.value() == HttpStatus.OK.value()) {
             val result = CustomerVerifyResponse(ref = data.results.ref)
             ApiResult.success(result, data.response.message)
         } else {
-            ApiResult.failed(HttpStatus.FAILED_DEPENDENCY, data.response.message)
+            ApiResult.failed(HttpStatus.FAILED_DEPENDENCY.value(), data.response.message)
         }
     }
 
@@ -71,7 +71,7 @@ class CustomerServiceImpl(
             passcode = request.passcode
         )
         val data = userClientService.registerCustomer(token.data!!, requestRegister)
-        if (data.response.status == HttpStatus.OK) {
+        if (data.response.status.value() == HttpStatus.OK.value()) {
             val userLocalRequest = CreateUserRequest(
                 phone = request.phone,
                 name = request.name,
@@ -82,16 +82,16 @@ class CustomerServiceImpl(
                 role = 1,
             )
             val user = userService.userRegister(userLocalRequest)
-            if (user.statusCode != HttpStatus.OK) {
+            if (user.statusCode != HttpStatus.OK.value()) {
                 return ApiResult.failed(user.statusCode, user.message)
             }
             if (user.data == null) {
-                return ApiResult.failed(HttpStatus.FAILED_DEPENDENCY, user.message)
+                return ApiResult.failed(HttpStatus.FAILED_DEPENDENCY.value(), user.message)
             }
 
             val userQrResult = userClientService.getUserByQr(data.results.token)
-            if (userQrResult.response.status != HttpStatus.OK) {
-                return ApiResult.failed(userQrResult.response.status, userQrResult.response.message)
+            if (userQrResult.response.status.value() != HttpStatus.OK.value()) {
+                return ApiResult.failed(userQrResult.response.status.value(), userQrResult.response.message)
             }
             val dataResult = CustomerTokenResponse(
                 userId = user.data?.userId!!,
@@ -103,7 +103,7 @@ class CustomerServiceImpl(
             )
             return ApiResult.success(dataResult, data.response.message)
         } else {
-            return ApiResult.failed(HttpStatus.FAILED_DEPENDENCY, data.response.message)
+            return ApiResult.failed(HttpStatus.FAILED_DEPENDENCY.value(), data.response.message)
         }
     }
 

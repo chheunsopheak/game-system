@@ -32,7 +32,7 @@ class AuthClientServiceImpl(retrofitManager: RetrofitManager) : AuthClientServic
 
         if (data.response.status != HttpStatus.OK) {
             return ApiResult.error(
-                statusCode = data.response.status,
+                statusCode = data.response.status.value(),
                 message = "Failed to get token: ${data.response.message}"
             )
         }

@@ -7,25 +7,25 @@ import service.store.StoreService
 
 @RestController
 @RequestMapping(BaseUrl.BASE_URL_ADMIN_V1)
-class AdminStoreController(private val storeService: StoreService) {
+class StoreController(private val storeService: StoreService) {
 
     @PostMapping("store")
-    suspend fun createStore(@RequestBody request: StoreRequest) = storeService.createStore(request)
+    fun createStore(@RequestBody request: StoreRequest) = storeService.createStore(request)
 
     @PutMapping("store/{id}")
-    suspend fun updateStore(@PathVariable id: String, @RequestBody request: StoreRequest) =
+    fun updateStore(@PathVariable id: String, @RequestBody request: StoreRequest) =
         storeService.updatedStore(id, request)
 
     @GetMapping("store/{id}")
-    suspend fun getStoreById(@PathVariable id: String) = storeService.getStoreById(id)
+    fun getStoreById(@PathVariable id: String) = storeService.getStoreById(id)
 
     @GetMapping("stores")
-    suspend fun getAllStores(
+    fun getAllStores(
         @RequestParam(defaultValue = "1") pageNumber: Int,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam("searchString", required = false) searchString: String?
     ) = storeService.getAll(pageNumber, pageSize, searchString)
 
     @DeleteMapping("store/{id}")
-    suspend fun deleteStoreById(@PathVariable id: String) = storeService.deleteStoreById(id)
+    fun deleteStoreById(@PathVariable id: String) = storeService.deleteStoreById(id)
 }

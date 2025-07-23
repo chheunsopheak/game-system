@@ -12,25 +12,25 @@ import service.game.GameService
 class GameController(private val gameService: GameService) {
 
     @GetMapping("/game/{id}")
-    suspend fun getGameById(@PathVariable id: String) = gameService.getGameById(id)
+    fun getGameById(@PathVariable id: String) = gameService.getGameById(id)
 
     @GetMapping("/games")
-    suspend fun getAllGames(
+    fun getAllGames(
         @RequestParam(defaultValue = "1") pageNumber: Int,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(required = false) searchString: String?
     ) = gameService.getAll(pageNumber, pageSize, searchString)
 
     @PostMapping("/game")
-    suspend fun createGame(@RequestBody request: GameRequest) = gameService.createGame(request)
+    fun createGame(@RequestBody request: GameRequest) = gameService.createGame(request)
 
     @PutMapping("/game/{id}")
-    suspend fun updateGame(@PathVariable id: String, @RequestBody request: GameRequest) =
+    fun updateGame(@PathVariable id: String, @RequestBody request: GameRequest) =
         gameService.updateGame(id, request)
 
     @DeleteMapping("/game/{id}")
-    suspend fun deleteGame(@PathVariable id: String) = gameService.deleteGame(id)
+    fun deleteGame(@PathVariable id: String) = gameService.deleteGame(id)
 
     @PatchMapping("/game/{id}")
-    suspend fun toggleGame(@PathVariable id: String) = gameService.toggleGame(id)
+    fun toggleGame(@PathVariable id: String) = gameService.toggleGame(id)
 }

@@ -52,7 +52,7 @@ open class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/api/admin/v1/auth/**",
-                    "/api/mobile/v1/auth/**",
+                    "/api/mobile/v1/**",
                     "/api/v1/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",

@@ -23,15 +23,15 @@ class DeviceServiceImpl(
     private val userService: UserService,
     private val userRepository: UserRepository
 ) : DeviceService {
-    override suspend fun getById(id: String): ApiResult<DeviceDetailResponse> {
+    override fun getById(id: String): ApiResult<DeviceDetailResponse> {
         val device = deviceRepository.findById(id)
         if (device.isEmpty)
-            return ApiResult.failed(HttpStatus.NOT_FOUND, "Device with id $id not found")
+            return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "Device with id $id not found")
         val data = DeviceDetailResponse.from(device.get())
         return ApiResult.success(data, "Device retrieved successfully")
     }
 
-    override suspend fun getAll(
+    override fun getAll(
         pageNumber: Int,
         pageSize: Int,
         searchString: String?
@@ -49,7 +49,7 @@ class DeviceServiceImpl(
         return response
     }
 
-    override suspend fun addDevice(request: DeviceRequest): ApiResult<String> {
+    override fun addDevice(request: DeviceRequest): ApiResult<String> {
         val requestAddUser = CreateUserRequest(
             username = NumGenerator.generateNo("D"),
             email = NumGenerator.generateNo("D"),
@@ -60,7 +60,7 @@ class DeviceServiceImpl(
             role = 1
         )
         val savedUser = userService.userRegister(requestAddUser)
-        if (savedUser.statusCode != HttpStatus.OK) {
+        if (savedUser.statusCode != HttpStatus.OK.value()) {
             return ApiResult.failed(
                 savedUser.statusCode,
                 savedUser.message ?: "Failed to save user"
@@ -70,7 +70,7 @@ class DeviceServiceImpl(
 
         if (user == null) {
             return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Failed to save user"
             )
         }
@@ -88,14 +88,14 @@ class DeviceServiceImpl(
         return ApiResult.success(requestDevice.id, "Device added successfully")
     }
 
-    override suspend fun updateDevice(
+    override fun updateDevice(
         id: String,
         request: DeviceRequest
     ): ApiResult<String> {
         val device = deviceRepository.findById(id)
         if (device == null) {
             return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "We couldn't find a device with the id $id."
             )
         }
@@ -109,11 +109,11 @@ class DeviceServiceImpl(
         return ApiResult.success(requestUpdate.id, "Device updated successfully")
     }
 
-    override suspend fun deleteDevice(id: String): ApiResult<String> {
+    override fun deleteDevice(id: String): ApiResult<String> {
         val device = deviceRepository.findById(id)
         if (device == null) {
             return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "We couldn't find a device with the id $id."
             )
         }

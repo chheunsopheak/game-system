@@ -36,7 +36,7 @@ class MerchantServiceImpl(
     private val userService: UserService,
     private val tokenService: TokenService
 ) : MerchantService {
-    override suspend fun merchantLogin(request: LoginRequest): ApiResult<MerchantLoginResponse> {
+    override fun merchantLogin(request: LoginRequest): ApiResult<MerchantLoginResponse> {
         val user = userRepository.findByPhone(request.username)
             ?: userRepository.findByEmail(request.username)
             ?: userRepository.findByUsername(request.username)
@@ -49,12 +49,12 @@ class MerchantServiceImpl(
 
         if (!merchant.isActive) {
             return ApiResult.failed(
-                HttpStatus.FORBIDDEN,
+                HttpStatus.FORBIDDEN.value(),
                 "Merchant account is not active"
             )
         }
         val userLogin = userService.adminLogin(request)
-        if (!userLogin.succeeded) {
+        if (!userLogin.success) {
             return ApiResult.error(
                 userLogin.statusCode,
                 userLogin.message ?: "Login failed"
@@ -62,7 +62,7 @@ class MerchantServiceImpl(
         }
         if (userLogin.data == null) {
             return ApiResult.error(
-                HttpStatus.FORBIDDEN,
+                HttpStatus.FORBIDDEN.value(),
                 "User is not a merchant"
             )
         }
@@ -81,14 +81,14 @@ class MerchantServiceImpl(
         return ApiResult.success(data, "Merchant login successful")
     }
 
-    override suspend fun getMyMerchant(): ApiResult<MyMerchantResponse> {
+    override fun getMyMerchant(): ApiResult<MyMerchantResponse> {
         val currentUser = userService.getMe().data
             ?: return ApiResult.notFound("User not found")
         val user = userRepository.findById(currentUser.id)
             ?: return ApiResult.notFound("User not found")
         if (user.get().storeId != null) {
             return ApiResult.error(
-                HttpStatus.FORBIDDEN,
+                HttpStatus.FORBIDDEN.value(),
                 "User is in store mode, not merchant mode"
             )
         }
@@ -110,13 +110,13 @@ class MerchantServiceImpl(
         return ApiResult.success(data, "Merchant retrieved successfully")
     }
 
-    override suspend fun merchantMode(request: MerchantModeRequest): ApiResult<MerchantLoginResponse> {
+    override fun merchantMode(request: MerchantModeRequest): ApiResult<MerchantLoginResponse> {
         if (request.userId.isBlank()) {
-            return ApiResult.error(HttpStatus.FORBIDDEN, "User ID must not be empty")
+            return ApiResult.error(HttpStatus.FORBIDDEN.value(), "User ID must not be empty")
         }
 
         if (request.mode.isBlank()) {
-            return ApiResult.error(HttpStatus.FORBIDDEN, "Mode must not be empty")
+            return ApiResult.error(HttpStatus.FORBIDDEN.value(), "Mode must not be empty")
         }
 
         val user = userRepository.findById(request.userId)
@@ -124,7 +124,7 @@ class MerchantServiceImpl(
 
         val mode = request.mode.uppercase()
         if (mode != "MERCHANT" && mode != "STORE") {
-            return ApiResult.error(HttpStatus.BAD_REQUEST, "Invalid mode. Must be either 'MERCHANT' or 'STORE'")
+            return ApiResult.error(HttpStatus.BAD_REQUEST.value(), "Invalid mode. Must be either 'MERCHANT' or 'STORE'")
         }
 
         val merchant = merchantRepository.findByUserId(user.get().id)
@@ -141,7 +141,7 @@ class MerchantServiceImpl(
                 ?: return ApiResult.notFound("Store not found")
 
             if (store.get().merchant.id != merchant.id) {
-                return ApiResult.error(HttpStatus.FORBIDDEN, "This store does not belong to your merchant")
+                return ApiResult.error(HttpStatus.FORBIDDEN.value(), "This store does not belong to your merchant")
             }
             user.get().storeId = store.get().id
         }
@@ -163,7 +163,7 @@ class MerchantServiceImpl(
         return ApiResult.success(data, "Switched to $mode mode successfully")
     }
 
-    override suspend fun createMerchant(request: MerchantRequest): ApiResult<String> {
+    override fun createMerchant(request: MerchantRequest): ApiResult<String> {
         if (request.phone.isBlank()) {
             return ApiResult.badRequest("Phone number must not be empty")
         }
@@ -173,14 +173,14 @@ class MerchantServiceImpl(
 
         if (userRepository.existsByPhone(request.phone)) {
             return ApiResult.error(
-                HttpStatus.CONFLICT,
+                HttpStatus.CONFLICT.value(),
                 "Phone number already exists in users"
             )
         }
 
         if (userRepository.existsByEmail(request.email)) {
             return ApiResult.error(
-                HttpStatus.CONFLICT,
+                HttpStatus.CONFLICT.value(),
                 "Email already exists in users"
             )
         }
@@ -188,7 +188,7 @@ class MerchantServiceImpl(
         val existingMerchantByPhone = merchantRepository.findByPhoneNumber(request.phone)
         if (existingMerchantByPhone != null) {
             return ApiResult.error(
-                HttpStatus.CONFLICT,
+                HttpStatus.CONFLICT.value(),
                 "Phone number already exists in merchants"
             )
         }
@@ -209,7 +209,7 @@ class MerchantServiceImpl(
         val userSave = userRepository.save(userRequest)
         val user = userRepository.findById(userSave.id)
             ?: return ApiResult.error(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Failed to create user for merchant"
             )
 
@@ -233,14 +233,14 @@ class MerchantServiceImpl(
         val saveMerchant = merchantRepository.save(merchant)
         if (saveMerchant.id.isBlank()) {
             return ApiResult.error(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Failed to create merchant"
             )
         }
         return ApiResult.success(saveMerchant.id, "Merchant has been created successfully")
     }
 
-    override suspend fun updateMerchant(
+    override fun updateMerchant(
         id: String,
         request: MerchantUpdateRequest
     ): ApiResult<String> {
@@ -268,7 +268,7 @@ class MerchantServiceImpl(
         return ApiResult.success(updateMerchant.id, "Merchant has been updated successfully")
     }
 
-    override suspend fun getMerchantById(id: String): ApiResult<MerchantDetailResponse> {
+    override fun getMerchantById(id: String): ApiResult<MerchantDetailResponse> {
         val merchant = merchantRepository.findMerchantById(id)
             ?: return ApiResult.notFound("Merchant not found")
 
@@ -291,7 +291,7 @@ class MerchantServiceImpl(
         return ApiResult.success(data, "Merchant retrieved successfully")
     }
 
-    override suspend fun getAllMerchants(
+    override fun getAllMerchants(
         pageNumber: Int,
         pageSize: Int,
         searchString: String?
@@ -309,19 +309,19 @@ class MerchantServiceImpl(
         return response
     }
 
-    override suspend fun deleteMerchant(merchantId: String): ApiResult<String> {
+    override fun deleteMerchant(merchantId: String): ApiResult<String> {
         val merchant = merchantRepository.findMerchantById(merchantId)
             ?: return ApiResult.notFound("Merchant not found")
 
         val userId = merchant.user.id
         userRepository.findById(userId)
-            ?: return ApiResult.failed(HttpStatus.CONFLICT, "Associated user not found")
+            ?: return ApiResult.failed(HttpStatus.CONFLICT.value(), "Associated user not found")
         try {
             merchantRepository.deleteById(merchantId)
             userRepository.deleteById(userId)
             return ApiResult.success(merchantId, "Merchant and associated user have been removed successfully")
         } catch (ex: Exception) {
-            return ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete merchant: ${ex.message}")
+            return ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to delete merchant: ${ex.message}")
         }
     }
 }

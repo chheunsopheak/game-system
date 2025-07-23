@@ -29,7 +29,7 @@ class RewardServiceImpl(
 ) : RewardService {
     override suspend fun getAllReward(): ApiResult<List<RewardResponse>> {
         val token = authApiClient.getToken()
-        if (token.statusCode != HttpStatus.OK) {
+        if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = token.statusCode,
                 message = "Failed to get token: ${token.message}"
@@ -38,7 +38,7 @@ class RewardServiceImpl(
         val data = rewardClient.getAllReward(token.data.toString())
         if (data.response.status != HttpStatus.OK) {
             return ApiResult.error(
-                data.response.status,
+                data.response.status.value(),
                 "Failed to ${data.response.message}"
             )
         }
@@ -93,7 +93,7 @@ class RewardServiceImpl(
     override suspend fun getRewardById(id: String): ApiResult<RewardDetailResponse> {
         val reward = rewardRepository.findById(id)
         if (reward == null) {
-            return ApiResult.error(HttpStatus.NOT_FOUND, "Reward not found")
+            return ApiResult.error(HttpStatus.NOT_FOUND.value(), "Reward not found")
         }
         val data = reward.get()
         val response = RewardDetailResponse.from(data)
@@ -143,7 +143,7 @@ class RewardServiceImpl(
     override suspend fun saveReward(request: UserRewardRequest): ApiResult<String> {
         val user = userRepository.findByPhone(request.phone)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Oops! That phone number doesn’t seem to be registered."
             )
         val game = request.gameId?.let { gameRepository.findById(it).orElse(null) }
@@ -183,13 +183,13 @@ class RewardServiceImpl(
         val user = userRepository.findByPhone(request.phone)
         if (user == null) {
             return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Oops! That phone number doesn’t seem to be registered."
             )
         }
 
         val token = authApiClient.getToken()
-        if (token.statusCode != HttpStatus.OK) {
+        if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = token.statusCode,
                 message = "Failed to get token: ${token.message}"
@@ -202,7 +202,7 @@ class RewardServiceImpl(
         val claimRequest = rewardClient.claimReward(token.data.toString(), requestData)
         if (claimRequest.response.status != HttpStatus.OK) {
             return ApiResult.error(
-                statusCode = claimRequest.response.status,
+                statusCode = claimRequest.response.status.value(),
                 message = "Failed to claim reward: ${claimRequest.response.message}"
             )
         }

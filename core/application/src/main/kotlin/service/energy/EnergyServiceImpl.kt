@@ -24,10 +24,10 @@ class EnergyServiceImpl(
     private val energyLogRepository: EnergyLogRepository,
     private val userRepository: UserRepository
 ) : EnergyService {
-    override suspend fun createMerchantEnergy(request: EnergyRequest): ApiResult<String> {
+    override fun createMerchantEnergy(request: EnergyRequest): ApiResult<String> {
         val merchant = merchantRepository.findMerchantById(request.merchantId)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Merchant not found"
             )
         val requestAdd = EnergyEntity(
@@ -43,13 +43,13 @@ class EnergyServiceImpl(
         )
     }
 
-    override suspend fun updateMerchantEnergy(
+    override fun updateMerchantEnergy(
         id: String,
         request: EnergyRequest
     ): ApiResult<String> {
         val energy = energyRepository.findById(id)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Energy not found"
             )
         val requestUpdate = energy.get()
@@ -64,10 +64,10 @@ class EnergyServiceImpl(
         )
     }
 
-    override suspend fun deleteEnergyById(id: String): ApiResult<String> {
+    override fun deleteEnergyById(id: String): ApiResult<String> {
         val energy = energyRepository.findById(id)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Energy not found"
             )
         energyRepository.deleteById(energy.get().id)
@@ -77,10 +77,10 @@ class EnergyServiceImpl(
         )
     }
 
-    override suspend fun getEnergyById(id: String): ApiResult<EnergyDetailResponse> {
+    override fun getEnergyById(id: String): ApiResult<EnergyDetailResponse> {
         val energy = energyRepository.findById(id)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Energy not found"
             )
         val response = EnergyDetailResponse.from(energy.get())
@@ -90,7 +90,7 @@ class EnergyServiceImpl(
         )
     }
 
-    override suspend fun getEnergiesByMerchantId(merchantId: String): ApiResult<EnergyResponse> {
+    override fun getEnergiesByMerchantId(merchantId: String): ApiResult<EnergyResponse> {
         val energies = energyRepository.findByMerchant_Id(merchantId)
         val response = EnergyResponse.from(energies!!)
         return ApiResult.success(
@@ -99,16 +99,16 @@ class EnergyServiceImpl(
         )
     }
 
-    override suspend fun consumeUserEnergy(request: EnergyConsumeRequest): ApiResult<String> {
+    override fun consumeUserEnergy(request: EnergyConsumeRequest): ApiResult<String> {
         val merchantEnergy = energyRepository.findByMerchant_Id(request.merchantId)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Merchant energy not found for the given user"
             )
 
         val user = userRepository.findById(request.userId)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "User not found"
             )
 
@@ -117,7 +117,7 @@ class EnergyServiceImpl(
             OperationEnum.ADD -> {
                 if (merchantEnergy.value < request.energy) {
                     return ApiResult.failed(
-                        HttpStatus.BAD_REQUEST,
+                        HttpStatus.BAD_REQUEST.value(),
                         "Cannot top up, Energy available: ${merchantEnergy.value}, requested: ${request.energy}"
                     )
                 }
@@ -129,7 +129,7 @@ class EnergyServiceImpl(
             OperationEnum.SUBTRACT -> {
                 if ((user.get().energy ?: 0) < request.energy) {
                     return ApiResult.failed(
-                        HttpStatus.BAD_REQUEST,
+                        HttpStatus.BAD_REQUEST.value(),
                         "Cannot subtract, User energy: ${user.get().energy}, requested: ${request.energy}"
                     )
                 }
@@ -160,12 +160,12 @@ class EnergyServiceImpl(
         )
     }
 
-    override suspend fun createMerchantEnergyLog(request: EnergyLogRequest): ApiResult<String> {
+    override fun createMerchantEnergyLog(request: EnergyLogRequest): ApiResult<String> {
         val merchant = merchantRepository.findMerchantById(request.merchantId)
-            ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "Merchant not found")
+            ?: return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "Merchant not found")
 
         val user = userRepository.findById(request.userId)
-            ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
+            ?: return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "User not found")
         val requestEnergyLog = EnergyLogEntity(
             merchant = merchant,
             user = user.get(),
@@ -180,9 +180,9 @@ class EnergyServiceImpl(
         )
     }
 
-    override suspend fun getEnergyLogById(id: String): ApiResult<EnergyLogDetailResponse> {
+    override fun getEnergyLogById(id: String): ApiResult<EnergyLogDetailResponse> {
         val energyLog = energyLogRepository.findById(id)
-            ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "Energy log not found")
+            ?: return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "Energy log not found")
 
         val response = EnergyLogDetailResponse.from(energyLog.get())
         return ApiResult.success(
@@ -192,7 +192,7 @@ class EnergyServiceImpl(
 
     }
 
-    override suspend fun getEnergyLogsByMerchantId(
+    override fun getEnergyLogsByMerchantId(
         merchantId: String,
         pageNumber: Int,
         pageSize: Int,
@@ -218,7 +218,7 @@ class EnergyServiceImpl(
         return response
     }
 
-    override suspend fun getEnergyLogsByUserId(
+    override fun getEnergyLogsByUserId(
         userId: String,
         pageNumber: Int,
         pageSize: Int,

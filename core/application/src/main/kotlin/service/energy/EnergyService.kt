@@ -8,26 +8,26 @@ import wrapper.ApiResult
 import wrapper.PaginatedResult
 
 interface EnergyService {
-    suspend fun createMerchantEnergy(request: EnergyRequest): ApiResult<String>
-    suspend fun updateMerchantEnergy(id: String, request: EnergyRequest): ApiResult<String>
-    suspend fun deleteEnergyById(id: String): ApiResult<String>
-    suspend fun getEnergyById(id: String): ApiResult<EnergyDetailResponse>
-    suspend fun getEnergiesByMerchantId(
+    fun createMerchantEnergy(request: EnergyRequest): ApiResult<String>
+    fun updateMerchantEnergy(id: String, request: EnergyRequest): ApiResult<String>
+    fun deleteEnergyById(id: String): ApiResult<String>
+    fun getEnergyById(id: String): ApiResult<EnergyDetailResponse>
+    fun getEnergiesByMerchantId(
         merchantId: String
     ): ApiResult<EnergyResponse>
 
-    suspend fun consumeUserEnergy(request: EnergyConsumeRequest): ApiResult<String>
+    fun consumeUserEnergy(request: EnergyConsumeRequest): ApiResult<String>
 
-    suspend fun createMerchantEnergyLog(request: EnergyLogRequest): ApiResult<String>
-    suspend fun getEnergyLogById(id: String): ApiResult<EnergyLogDetailResponse>
-    suspend fun getEnergyLogsByMerchantId(
+    fun createMerchantEnergyLog(request: EnergyLogRequest): ApiResult<String>
+    fun getEnergyLogById(id: String): ApiResult<EnergyLogDetailResponse>
+    fun getEnergyLogsByMerchantId(
         merchantId: String,
         pageNumber: Int,
         pageSize: Int,
         searchString: String? = null
     ): PaginatedResult<EnergyLogMerchantResponse>
 
-    suspend fun getEnergyLogsByUserId(
+    fun getEnergyLogsByUserId(
         userId: String,
         pageNumber: Int,
         pageSize: Int,

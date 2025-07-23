@@ -23,24 +23,24 @@ class StoreServiceImpl(
     private val merchantRepository: MerchantRepository,
     private val userService: UserService
 ) : StoreService {
-    override suspend fun myStore(storeId: String): ApiResult<MyStoreResponse> {
+    override fun myStore(storeId: String): ApiResult<MyStoreResponse> {
         if (storeId.isBlank()) {
             return ApiResult.failed(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.value(),
                 "Store ID cannot be empty"
             )
         }
 
         val currentUser = userService.getMe().data
             ?: return ApiResult.failed(
-                HttpStatus.UNAUTHORIZED,
+                HttpStatus.UNAUTHORIZED.value(),
                 "User not authenticated"
             )
         val user = userRepository.findById(currentUser.id)
             ?: return ApiResult.notFound("User with ID ${currentUser.id} does not exist")
         if (user.get().storeId.isNullOrEmpty()) {
             return ApiResult.error(
-                HttpStatus.FORBIDDEN,
+                HttpStatus.FORBIDDEN.value(),
                 "User is in merchant mode, not store mode"
             )
         }
@@ -51,7 +51,7 @@ class StoreServiceImpl(
             ?: return ApiResult.notFound("Store with ID $storeId does not exist")
         if (store.get().merchant.id != merchant.id) {
             return ApiResult.failed(
-                HttpStatus.FORBIDDEN,
+                HttpStatus.FORBIDDEN.value(),
                 "Store with ID $storeId does not belong to the merchant"
             )
         }
@@ -72,23 +72,23 @@ class StoreServiceImpl(
         )
     }
 
-    override suspend fun createStore(request: StoreRequest): ApiResult<String> {
+    override fun createStore(request: StoreRequest): ApiResult<String> {
         if (request.name.isBlank() || request.merchantId.isBlank()) {
             return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Store name and merchant ID cannot be empty"
             )
         }
         if (storeRepository.existsByNameAndMerchantId(request.name, request.merchantId)) {
             return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Store with this merchant ID already exists"
             )
         }
         val merchant = merchantRepository.findMerchantById(request.merchantId)
         if (merchant == null) {
             return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Merchant with ID ${request.merchantId} does not exist"
             )
         }
@@ -112,21 +112,21 @@ class StoreServiceImpl(
         )
     }
 
-    override suspend fun updatedStore(
+    override fun updatedStore(
         id: String,
         request: StoreRequest
     ): ApiResult<String> {
         val merchant = merchantRepository.findMerchantById(request.merchantId)
         if (merchant == null) {
             return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Merchant with ID ${request.merchantId} does not exist"
             )
         }
         val store = storeRepository.findById(id)
             .takeIf { it -> it.get().merchant.id == request.merchantId }
             ?: return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Store with ID $id does not exist or does not belong to the merchant"
             )
         val requestUpdate = store.get()
@@ -146,10 +146,10 @@ class StoreServiceImpl(
         )
     }
 
-    override suspend fun getStoreById(id: String): ApiResult<StoreDetailResponse> {
+    override fun getStoreById(id: String): ApiResult<StoreDetailResponse> {
         val store = storeRepository.findById(id)
             ?: return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Store with ID $id does not exist"
             )
         val data = store.get()
@@ -160,7 +160,7 @@ class StoreServiceImpl(
         )
     }
 
-    override suspend fun getAll(
+    override fun getAll(
         pageNumber: Int,
         pageSize: Int,
         searchString: String?
@@ -178,10 +178,10 @@ class StoreServiceImpl(
         return response
     }
 
-    override suspend fun deleteStoreById(id: String): ApiResult<String> {
+    override fun deleteStoreById(id: String): ApiResult<String> {
         val store = storeRepository.findById(id)
             ?: return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Store with ID $id does not exist"
             )
         storeRepository.delete(store.get())
@@ -191,7 +191,7 @@ class StoreServiceImpl(
         )
     }
 
-    override suspend fun getAllStoreByMerchantId(merchantId: String): ApiResult<List<StoreDetailResponse>> {
+    override fun getAllStoreByMerchantId(merchantId: String): ApiResult<List<StoreDetailResponse>> {
         val stores = storeRepository.findAllByMerchantId(merchantId)
         val data = stores.map(StoreDetailResponse::from)
         return ApiResult.success(

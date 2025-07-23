@@ -7,9 +7,9 @@ import wrapper.ApiResult
 import wrapper.PaginatedResult
 
 interface DeviceService {
-    suspend fun getById(id: String): ApiResult<DeviceDetailResponse>
-    suspend fun getAll(pageNumber: Int, pageSize: Int, searchString: String?): PaginatedResult<DeviceResponse>
-    suspend fun addDevice(request: DeviceRequest): ApiResult<String>
-    suspend fun updateDevice(id: String, request: DeviceRequest): ApiResult<String>
-    suspend fun deleteDevice(id: String): ApiResult<String>
+    fun getById(id: String): ApiResult<DeviceDetailResponse>
+    fun getAll(pageNumber: Int, pageSize: Int, searchString: String?): PaginatedResult<DeviceResponse>
+    fun addDevice(request: DeviceRequest): ApiResult<String>
+    fun updateDevice(id: String, request: DeviceRequest): ApiResult<String>
+    fun deleteDevice(id: String): ApiResult<String>
 }

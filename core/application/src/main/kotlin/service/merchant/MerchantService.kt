@@ -12,23 +12,23 @@ import wrapper.ApiResult
 import wrapper.PaginatedResult
 
 interface MerchantService {
-    suspend fun merchantLogin(request: LoginRequest): ApiResult<MerchantLoginResponse>
+    fun merchantLogin(request: LoginRequest): ApiResult<MerchantLoginResponse>
 
-    suspend fun getMyMerchant(): ApiResult<MyMerchantResponse>
+    fun getMyMerchant(): ApiResult<MyMerchantResponse>
 
-    suspend fun merchantMode(request: MerchantModeRequest): ApiResult<MerchantLoginResponse>
+    fun merchantMode(request: MerchantModeRequest): ApiResult<MerchantLoginResponse>
 
-    suspend fun createMerchant(request: MerchantRequest): ApiResult<String>
+    fun createMerchant(request: MerchantRequest): ApiResult<String>
 
-    suspend fun updateMerchant(id: String, request: MerchantUpdateRequest): ApiResult<String>
+    fun updateMerchant(id: String, request: MerchantUpdateRequest): ApiResult<String>
 
-    suspend fun getMerchantById(id: String): ApiResult<MerchantDetailResponse>
+    fun getMerchantById(id: String): ApiResult<MerchantDetailResponse>
 
-    suspend fun getAllMerchants(
+    fun getAllMerchants(
         pageNumber: Int,
         pageSize: Int,
         searchString: String?
     ): PaginatedResult<MerchantResponse>
 
-    suspend fun deleteMerchant(merchantId: String): ApiResult<String>
+    fun deleteMerchant(merchantId: String): ApiResult<String>
 }

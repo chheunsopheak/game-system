@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
         "com.gamesystem",
         "service",
         "config",
-        "user",
         "filter",
         "jwt",
         "auth",

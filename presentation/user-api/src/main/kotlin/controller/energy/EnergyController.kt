@@ -2,9 +2,15 @@ package com.gamesystem.controller.energy
 
 import constant.BaseUrl
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import request.energy.EnergyConsumeRequest
+import response.energy.EnergyLogDetailResponse
+import response.energy.EnergyLogMerchantResponse
+import response.energy.EnergyLogUserResponse
 import service.energy.EnergyService
+import wrapper.ApiResult
+import wrapper.PaginatedResult
 
 
 @RestController
@@ -12,28 +18,40 @@ import service.energy.EnergyService
 class EnergyController(private val energyService: EnergyService) {
 
     @GetMapping("merchant/{merchantId}/energy-activities")
-    suspend fun getEnergyLogsByMerchantId(
+    fun getEnergyLogsByMerchantId(
         @PathVariable merchantId: String,
         @RequestParam(defaultValue = "1") pageNumber: Int,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(required = false) searchString: String?
-    ) = energyService.getEnergyLogsByMerchantId(merchantId, pageNumber, pageSize, searchString)
+    ): ResponseEntity<PaginatedResult<EnergyLogMerchantResponse>> {
+        val request = energyService.getEnergyLogsByMerchantId(merchantId, pageNumber, pageSize, searchString)
+        return ResponseEntity.status(request.statusCode).body(request)
+    }
 
     @GetMapping("user/{userId}/energy-activities")
-    suspend fun getEnergyLogsByUserId(
+    fun getEnergyLogsByUserId(
         @PathVariable userId: String,
         @RequestParam(defaultValue = "1") pageNumber: Int,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(required = false) searchString: String?
-    ) = energyService.getEnergyLogsByUserId(userId, pageNumber, pageSize, searchString)
+    ): ResponseEntity<PaginatedResult<EnergyLogUserResponse>> {
+        val request = energyService.getEnergyLogsByUserId(userId, pageNumber, pageSize, searchString)
+        return ResponseEntity.status(request.statusCode).body(request)
+    }
 
     @GetMapping("energy-activity/{id}")
-    suspend fun getEnergyLogs(
+    fun getEnergyLogs(
         @PathVariable id: String,
-    ) = energyService.getEnergyLogById(id)
+    ): ResponseEntity<ApiResult<EnergyLogDetailResponse>> {
+        val request = energyService.getEnergyLogById(id)
+        return ResponseEntity.status(request.statusCode).body(request)
+    }
 
     @PostMapping("user-consume/energy")
-    suspend fun consumeUserEnergy(
+    fun consumeUserEnergy(
         @Valid @RequestBody request: EnergyConsumeRequest
-    ) = energyService.consumeUserEnergy(request)
+    ): ResponseEntity<ApiResult<String>> {
+        val result = energyService.consumeUserEnergy(request)
+        return ResponseEntity.status(result.statusCode).body(result)
+    }
 }

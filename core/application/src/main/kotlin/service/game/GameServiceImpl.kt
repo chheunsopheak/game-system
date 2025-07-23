@@ -27,7 +27,7 @@ class GameServiceImpl(
     private val rewardService: RewardService,
     private val gameHistoryService: GameHistoryService
 ) : GameService {
-    override suspend fun getAll(
+    override fun getAll(
         pageNumber: Int,
         pageSize: Int,
         searchString: String?
@@ -45,7 +45,7 @@ class GameServiceImpl(
         return response
     }
 
-    override suspend fun getAllActiveGames(
+    override fun getAllActiveGames(
         pageNumber: Int,
         pageSize: Int,
         searchString: String?
@@ -65,10 +65,10 @@ class GameServiceImpl(
         return response
     }
 
-    override suspend fun createGame(request: GameRequest): ApiResult<String> {
+    override fun createGame(request: GameRequest): ApiResult<String> {
         val existGame = gameRepository.existsByName(request.name)
         if (existGame) {
-            return ApiResult.failed(HttpStatus.BAD_REQUEST, "Game name already exists")
+            return ApiResult.failed(HttpStatus.BAD_REQUEST.value(), "Game name already exists")
         }
         val requestGame = GameEntity(
             name = request.name,
@@ -83,13 +83,13 @@ class GameServiceImpl(
         return ApiResult.success(requestGame.id, "Game created successfully")
     }
 
-    override suspend fun updateGame(
+    override fun updateGame(
         id: String,
         request: GameRequest
     ): ApiResult<String> {
         val game = gameRepository.findById(id)
         if (game == null) {
-            return ApiResult.failed(HttpStatus.NOT_FOUND, "Game not found")
+            return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "Game not found")
         }
         val requestUpdate = game.get()
         requestUpdate.name = request.name
@@ -103,19 +103,19 @@ class GameServiceImpl(
         return ApiResult.success(requestUpdate.id, "Game updated successfully")
     }
 
-    override suspend fun deleteGame(id: String): ApiResult<String> {
+    override fun deleteGame(id: String): ApiResult<String> {
         val game = gameRepository.findById(id)
         if (game == null) {
-            return ApiResult.failed(HttpStatus.NOT_FOUND, "Game not found")
+            return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "Game not found")
         }
         gameRepository.deleteById(id)
         return ApiResult.success(id, "Game deleted successfully")
     }
 
-    override suspend fun toggleGame(id: String): ApiResult<String> {
+    override fun toggleGame(id: String): ApiResult<String> {
         val game = gameRepository.findById(id)
         if (game == null) {
-            return ApiResult.failed(HttpStatus.NOT_FOUND, "Game not found")
+            return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "Game not found")
         }
         val requestUpdate = game.get()
         requestUpdate.isActive = !requestUpdate.isActive
@@ -123,10 +123,10 @@ class GameServiceImpl(
         return ApiResult.success(requestUpdate.id, "Game updated successfully")
     }
 
-    override suspend fun getGameById(id: String): ApiResult<GameDetailResponse> {
+    override fun getGameById(id: String): ApiResult<GameDetailResponse> {
         val game = gameRepository.findById(id)
         if (game == null) {
-            return ApiResult.failed(HttpStatus.NOT_FOUND, "Game not found")
+            return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "Game not found")
         }
         val data = game.get()
         val response = GameDetailResponse.from(data)
@@ -139,7 +139,7 @@ class GameServiceImpl(
     override suspend fun gamePlay(request: GamePlayRequest): ApiResult<GamePlayResponse> {
         val user = userRepository.findByPhone(request.phone)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Oops! That phone number doesn’t seem to be registered."
             )
 //        userService.userDeductEnergy(user.id, request.energy)
@@ -150,16 +150,16 @@ class GameServiceImpl(
         val refList = listOf("BL001", "BL002", "BL003", "BL004", "BL005", "BL006", "BL007", "BL008")
 
         val rewardsResult = rewardService.getAllReward()
-        if (rewardsResult.statusCode != HttpStatus.OK || rewardsResult.data.isNullOrEmpty()) {
+        if (rewardsResult.statusCode != HttpStatus.OK.value() || rewardsResult.data.isNullOrEmpty()) {
             return ApiResult.failed(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.value(),
                 "No rewards available."
             )
         }
 
         val rewards = rewardsResult.data?.filter { it.ref in refList }
         val selectedReward = rewardService.rewardPicker(10, countData, rewards!!)
-        if (selectedReward.statusCode != HttpStatus.OK) {
+        if (selectedReward.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = selectedReward.statusCode,
                 message = selectedReward.message
@@ -168,13 +168,13 @@ class GameServiceImpl(
         val rewardItem = selectedReward.data
         if (rewardItem == null) {
             return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Selected reward has no items."
             )
         }
-        val selectedItem = rewardItem?.item?.randomOrNull()
+        val selectedItem = rewardItem.item.randomOrNull()
             ?: return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Selected reward has no items."
             )
 
@@ -194,7 +194,7 @@ class GameServiceImpl(
 
         )
         val createReward = rewardService.saveReward(rewardSave)
-        if (createReward.statusCode != HttpStatus.OK) {
+        if (createReward.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = createReward.statusCode,
                 message = createReward.message
@@ -208,7 +208,7 @@ class GameServiceImpl(
                 data = selectedItem.data
             )
         )
-        if (claimReward.statusCode != HttpStatus.OK) {
+        if (claimReward.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = claimReward.statusCode,
                 message = claimReward.message
@@ -228,12 +228,12 @@ class GameServiceImpl(
     override suspend fun gamePlayPickUp(request: UserPlayGameRequest): ApiResult<GamePlayResponse> {
         val user = userRepository.findByPhone(request.phone)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Oops! That phone number doesn’t seem to be registered."
             )
         val game = gameRepository.findById(request.gameId!!)
             ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
                 "Oops! We couldn’t find the game. Please check the game ID and try again."
             )
 
@@ -256,9 +256,9 @@ class GameServiceImpl(
         val playCountData = playCount.data?.toInt() ?: 0
 
         val rewardsResult = rewardService.getAllReward()
-        if (rewardsResult.statusCode != HttpStatus.OK || rewardsResult.data.isNullOrEmpty()) {
+        if (rewardsResult.statusCode != HttpStatus.OK.value() || rewardsResult.data.isNullOrEmpty()) {
             return ApiResult.failed(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.value(),
                 "Failed to get rewards: ${rewardsResult.message}"
             )
         }
@@ -267,13 +267,13 @@ class GameServiceImpl(
         val rewardItem = selectedReward.data
         if (rewardItem == null) {
             return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Selected reward has no items."
             )
         }
         val selectedItem = rewardItem.item.randomOrNull()
             ?: return ApiResult.failed(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Selected reward has no items."
             )
         //  Create and Save User Win Reward
@@ -292,7 +292,7 @@ class GameServiceImpl(
 
         )
         val createReward = rewardService.saveReward(rewardSave)
-        if (createReward.statusCode != HttpStatus.OK) {
+        if (createReward.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = createReward.statusCode,
                 message = createReward.message
@@ -306,7 +306,7 @@ class GameServiceImpl(
                 data = selectedItem.data
             )
         )
-        if (claimReward.statusCode != HttpStatus.OK) {
+        if (claimReward.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
                 statusCode = claimReward.statusCode,
                 message = claimReward.message

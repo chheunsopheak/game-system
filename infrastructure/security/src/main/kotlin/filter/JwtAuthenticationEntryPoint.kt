@@ -22,7 +22,7 @@ class JwtAuthenticationEntryPoint : AuthenticationEntryPoint {
             {
               "statusCode": ${HttpServletResponse.SC_UNAUTHORIZED},
               "message": "${authException.message?.replace("\"", "\\\"")}",
-              "succeeded": "false"
+              "success": "false"
             } """.trimIndent()
 
         response.status = HttpServletResponse.SC_UNAUTHORIZED

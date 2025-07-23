@@ -66,7 +66,7 @@ class GlobalExceptionHandler {
     fun handleAccessDeniedException(ex: AccessDeniedException): ApiResult<ErrorResult> {
         val errorMessage = "Access denied: ${ex.message}"
         logger.warning(errorMessage)
-        return ApiResult.error(HttpStatus.FORBIDDEN, errorMessage)
+        return ApiResult.error(HttpStatus.FORBIDDEN.value(), errorMessage)
     }
 
     @ExceptionHandler(BadCredentialsException::class)
@@ -75,21 +75,21 @@ class GlobalExceptionHandler {
         request: HttpServletRequest
     ): ApiResult<ErrorResult> {
         logger.warning("Unauthorized access attempt: ${request.requestURI} - ${ex.message}")
-        return ApiResult.error(HttpStatus.UNAUTHORIZED, "Unauthorized: ${ex.message}")
+        return ApiResult.error(HttpStatus.UNAUTHORIZED.value(), "Unauthorized: ${ex.message}")
     }
 
     @ExceptionHandler(AuthenticationException::class)
     fun handleAuthenticationException(ex: AuthenticationException): ApiResult<ErrorResult> {
         val errorMessage = "Authentication failed: ${ex.message}"
         logger.warning(errorMessage)
-        return ApiResult.error(HttpStatus.UNAUTHORIZED, errorMessage)
+        return ApiResult.error(HttpStatus.UNAUTHORIZED.value(), errorMessage)
     }
 
     @ExceptionHandler(HttpClientErrorException::class)
     fun handleUnauthorizedException(ex: HttpClientErrorException): ApiResult<ErrorResult> {
         val errorMessage = "You are not authorized to access this resource: ${ex.message}"
         logger.warning(errorMessage)
-        return ApiResult.error(HttpStatus.UNAUTHORIZED, errorMessage)
+        return ApiResult.error(HttpStatus.UNAUTHORIZED.value(), errorMessage)
     }
 
     @ExceptionHandler(ConstraintViolationException::class)
@@ -110,7 +110,7 @@ class GlobalExceptionHandler {
     fun handleTimeoutException(ex: TimeoutException): ApiResult<ErrorResult> {
         val errorMessage = "Request timed out: ${ex.message}"
         logger.warning(errorMessage)
-        return ApiResult.error(HttpStatus.GATEWAY_TIMEOUT, errorMessage)
+        return ApiResult.error(HttpStatus.GATEWAY_TIMEOUT.value(), errorMessage)
 
     }
 
@@ -118,14 +118,14 @@ class GlobalExceptionHandler {
     fun handleHttpRequestMethodNotSupportedException(ex: HttpRequestMethodNotSupportedException): ApiResult<ErrorResult> {
         val errorMessage = "Method not allowed: ${ex.method}"
         logger.warning(errorMessage)
-        return ApiResult.error(HttpStatus.METHOD_NOT_ALLOWED, errorMessage)
+        return ApiResult.error(HttpStatus.METHOD_NOT_ALLOWED.value(), errorMessage)
     }
 
     @ExceptionHandler(UnsupportedMediaTypeStatusException::class)
     fun handleUnsupportedMediaTypeStatusException(ex: UnsupportedMediaTypeStatusException): ApiResult<ErrorResult> {
         val errorMessage = "Unsupported media type: ${ex.message}"
         logger.warning(errorMessage)
-        return ApiResult.error(HttpStatus.UNSUPPORTED_MEDIA_TYPE, errorMessage)
+        return ApiResult.error(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), errorMessage)
     }
 
     @ExceptionHandler(BadRequestException::class)
@@ -138,7 +138,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException::class)
     fun handleRateLimitException(ex: RuntimeException): ApiResult<ErrorResult> {
         logger.warning(ex.message)
-        return ApiResult.error(HttpStatus.TOO_MANY_REQUESTS, ex.message)
+        return ApiResult.error(HttpStatus.TOO_MANY_REQUESTS.value(), ex.message)
     }
 
 }

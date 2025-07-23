@@ -51,7 +51,7 @@ class UserServiceImpl(
     override fun getUserById(id: String): ApiResult<UserDetailResponse> {
         val user = userRepository.findById(id)
         if (user.isEmpty)
-            return ApiResult.failed(HttpStatus.NOT_EXTENDED, "User with id $id not found")
+            return ApiResult.failed(HttpStatus.NOT_EXTENDED.value(), "User with id $id not found")
         val data = UserDetailResponse.from(user.get())
         return ApiResult.success(data, "User retrieved successfully")
     }
@@ -59,7 +59,7 @@ class UserServiceImpl(
     override fun getMe(): ApiResult<UserResponse> {
         val userId = tokenService.getCurrentUserId()
         val user = userRepository.findById(userId)
-            ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
+            ?: return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "User not found")
         val userData = user.get()
         return ApiResult.success(
             UserResponse(
@@ -83,7 +83,7 @@ class UserServiceImpl(
     override fun updateUser(request: UpdateUserRequest): ApiResult<String> {
         val userId = tokenService.getCurrentUserId()
         val user = userRepository.findById(userId)
-            ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
+            ?: return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "User not found")
         val requestUpdate = user.get()
 
         requestUpdate.name = request.name
@@ -98,13 +98,13 @@ class UserServiceImpl(
 
     override fun userRegister(request: CreateUserRequest): ApiResult<UserTokenResponse> {
         if (userRepository.existsByEmail(request.email)) {
-            return ApiResult.error(HttpStatus.CONFLICT, "User already exists")
+            return ApiResult.error(HttpStatus.CONFLICT.value(), "User already exists")
         }
         if (userRepository.existsByPhone(request.phone)) {
-            return ApiResult.error(HttpStatus.CONFLICT, "Phone number already exists")
+            return ApiResult.error(HttpStatus.CONFLICT.value(), "Phone number already exists")
         }
         if (userRepository.findByUsername(request.username) != null) {
-            return ApiResult.error(HttpStatus.CONFLICT, "This ${request.username} already taken")
+            return ApiResult.error(HttpStatus.CONFLICT.value(), "This ${request.username} already taken")
         }
         val newUser = UserEntity(
             username = request.username,
@@ -137,21 +137,21 @@ class UserServiceImpl(
         val user = userRepository.findByUsername(request.username)
             ?: userRepository.findByEmail(request.username)
             ?: userRepository.findByPhone(request.username)
-            ?: return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Invalid username or password")
+            ?: return ApiResult.failed(HttpStatus.UNAUTHORIZED.value(), "Invalid username or password")
 
         if (!user.isActive) {
-            return ApiResult.failed(HttpStatus.UNAUTHORIZED, "User is not active")
+            return ApiResult.failed(HttpStatus.UNAUTHORIZED.value(), "User is not active")
         }
         val userDevice = deviceRepository.findByUserId(user.id)
         if (userDevice == null) {
             return ApiResult.failed(
-                HttpStatus.UNAUTHORIZED,
+                HttpStatus.UNAUTHORIZED.value(),
                 "Your are no permitted to login without device"
             )
         }
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
-            return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Invalid username or password")
+            return ApiResult.failed(HttpStatus.UNAUTHORIZED.value(), "Invalid username or password")
         }
 
         user.lastLogin = LocalDateTime.now()
@@ -174,14 +174,14 @@ class UserServiceImpl(
         val user = userRepository.findByUsername(request.username)
             ?: userRepository.findByEmail(request.username)
             ?: userRepository.findByPhone(request.username)
-            ?: return ApiResult.failed(HttpStatus.BAD_REQUEST, "User not found")
+            ?: return ApiResult.failed(HttpStatus.BAD_REQUEST.value(), "User not found")
 
         if (!user.isActive) {
-            return ApiResult.failed(HttpStatus.UNAUTHORIZED, "User is not active")
+            return ApiResult.failed(HttpStatus.UNAUTHORIZED.value(), "User is not active")
         }
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
-            return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Invalid username or password")
+            return ApiResult.failed(HttpStatus.UNAUTHORIZED.value(), "Invalid username or password")
         }
         if (passwordEncoder.matches(request.password, user.passwordHash)) {
             user.lastLogin = LocalDateTime.now()
@@ -199,17 +199,17 @@ class UserServiceImpl(
 
             return ApiResult.success(response, "User logged in successfully")
         }
-        return ApiResult.failed(HttpStatus.UNAUTHORIZED, "No permission for access the resource")
+        return ApiResult.failed(HttpStatus.UNAUTHORIZED.value(), "No permission for access the resource")
     }
 
     override fun changePassword(request: UserChangePasswordRequest): ApiResult<String> {
         val userId = tokenService.getCurrentUserId()
         val user = userRepository.findById(userId)
-            ?: return ApiResult.failed(HttpStatus.NOT_FOUND, "User not found")
+            ?: return ApiResult.failed(HttpStatus.NOT_FOUND.value(), "User not found")
 
         val userRequest = user.get()
         if (!passwordEncoder.matches(request.oldPassword, userRequest.passwordHash)) {
-            return ApiResult.failed(HttpStatus.UNAUTHORIZED, "Old password is incorrect")
+            return ApiResult.failed(HttpStatus.UNAUTHORIZED.value(), "Old password is incorrect")
         }
 
         userRequest.passwordHash = passwordEncoder.encode(request.newPassword)
