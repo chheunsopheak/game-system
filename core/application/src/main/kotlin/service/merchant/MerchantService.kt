@@ -3,7 +3,7 @@ package service.merchant
 import request.merchant.MerchantModeRequest
 import request.merchant.MerchantRequest
 import request.merchant.MerchantUpdateRequest
-import request.user.LoginRequest
+import request.auth.LoginRequest
 import response.merchant.MerchantDetailResponse
 import response.merchant.MerchantLoginResponse
 import response.merchant.MerchantResponse

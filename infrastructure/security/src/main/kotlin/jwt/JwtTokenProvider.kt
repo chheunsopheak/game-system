@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
 import response.TokenResponse
 import service.UserPrinciple
+import java.security.SecureRandom
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -28,26 +29,23 @@ class JwtTokenProvider(
         val now = Instant.now()
         val expiry = now.plus(7, ChronoUnit.DAYS)
 
-        val token = Jwts.builder()
-            .setHeaderParam("typ", "JWT")
-            .setSubject(userDetails.getId())
-            .setIssuedAt(Date.from(now))
-            .setExpiration(Date.from(expiry))
-            .claim("username", userDetails.username)
-            .claim("roles", userDetails.authorities.map { it.authority })
-            .signWith(secretKey, SignatureAlgorithm.HS256)
-            .compact()
+        val token =
+            Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setSubject(userDetails.getId())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiry))
+                .claim("username", userDetails.username)
+                .claim("roles", userDetails.authorities.map { it.authority })
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact()
 
         return TokenResponse(token, expiry.toEpochMilli())
     }
 
     fun extractClaims(token: String): Claims {
         try {
-            return Jwts.parser()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .body
+            return Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token).body
         } catch (ex: JwtException) {
             log.error("JWT parsing error: ${ex.message}", ex)
             throw ex
@@ -81,5 +79,12 @@ class JwtTokenProvider(
 
     fun extractUserName(token: String): String {
         return extractClaims(token).get("username", String::class.java)
+    }
+
+    fun generateRefreshToken(): String {
+        val random = SecureRandom()
+        val bytes = ByteArray(64)
+        random.nextBytes(bytes)
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
     }
 }

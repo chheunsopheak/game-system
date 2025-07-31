@@ -12,4 +12,5 @@ interface UserRepository : BaseRepository<UserEntity, String> {
     fun existsByUsername(username: String): Boolean
     fun existsByEmail(email: String): Boolean
     fun existsByPhone(phone: String): Boolean
+    fun findByRefreshToken(refreshToken: String): UserEntity?
 }

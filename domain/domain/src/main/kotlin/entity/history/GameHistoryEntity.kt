@@ -32,13 +32,4 @@ class GameHistoryEntity(
 
     @Column(name = "energy", nullable = false)
     var energy: Int = 0,
-) : BaseEntity() {
-    constructor() : this(
-        user = null,
-        game = null,
-        gameName = "",
-        device = "",
-        playedAt = LocalDateTime.now(),
-        energy = 0
-    )
-}
+) : BaseEntity()

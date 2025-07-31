@@ -43,17 +43,4 @@ data class StoreEntity(
     @JoinColumn(name = "merchant_id", nullable = false)
     var merchant: MerchantEntity
 
-) : BaseEntity() {
-    constructor() : this(
-        name = "",
-        logoUrl = "",
-        coverUrl = "",
-        location = "",
-        managerName = "",
-        contactNumber = "",
-        openHours = LocalDateTime.now(),
-        description = "",
-        verified = false,
-        merchant = MerchantEntity()
-    )
-}
+) : BaseEntity()

@@ -1,7 +1,7 @@
 package service.user
 
 import request.user.CreateUserRequest
-import request.user.LoginRequest
+import request.auth.LoginRequest
 import request.user.UpdateUserRequest
 import request.user.UserChangePasswordRequest
 import response.user.UserDetailResponse
@@ -16,8 +16,5 @@ interface UserService {
     fun getMe(): ApiResult<UserResponse>
     fun getUserInfo(phone: String): ApiResult<UserResponse>
     fun updateUser(request: UpdateUserRequest): ApiResult<String>
-    fun userRegister(request: CreateUserRequest): ApiResult<UserTokenResponse>
-    fun deviceLogin(request: LoginRequest): ApiResult<UserTokenResponse>
-    fun adminLogin(request: LoginRequest): ApiResult<UserTokenResponse>
     fun changePassword(request: UserChangePasswordRequest): ApiResult<String>
 }

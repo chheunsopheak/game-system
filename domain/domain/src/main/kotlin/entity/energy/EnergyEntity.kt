@@ -13,9 +13,4 @@ data class EnergyEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id", nullable = false)
     var merchant: MerchantEntity
-) : BaseEntity() {
-    constructor() : this(
-        value = 0,
-        merchant = MerchantEntity()
-    )
-}
+) : BaseEntity()

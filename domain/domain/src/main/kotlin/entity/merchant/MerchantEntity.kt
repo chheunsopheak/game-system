@@ -48,16 +48,4 @@ class MerchantEntity(
     @OneToMany(mappedBy = "merchant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var energyLogs: MutableList<EnergyLogEntity> = mutableListOf()
 
-) : BaseEntity() {
-    constructor() : this(
-        name = "",
-        email = "",
-        phoneNumber = null,
-        description = null,
-        logoUrl = null,
-        coverUrl = null,
-        address = null,
-        verified = false,
-        user = UserEntity()
-    )
-}
+) : BaseEntity()

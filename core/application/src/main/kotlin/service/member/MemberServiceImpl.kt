@@ -21,7 +21,7 @@ class MemberServiceImpl(
     override fun getAllMember(): ApiResult<List<MemberResponse>> {
         val members = memberRepository.findAll()
         val response = members
-            .sortedByDescending { it.ticket }
+            .sortedByDescending { it.no }
             .map { member ->
                 MemberResponse(
                     id = member.id,

@@ -12,6 +12,7 @@ import request.user.UserClientVerifyRequest
 import response.customer.CustomerTokenResponse
 import response.customer.CustomerVerifyResponse
 import service.auth.AuthClientService
+import service.auth.AuthService
 import service.user.UserClientService
 import service.user.UserService
 import wrapper.ApiResult
@@ -20,19 +21,17 @@ import wrapper.ApiResult
 class CustomerServiceImpl(
     private val userClientService: UserClientService,
     private val authClient: AuthClientService,
-    private val userService: UserService
+    private val authService: AuthService
 ) : CustomerService {
     override suspend fun sendCodeCustomer(request: CustomerSendRequest): ApiResult<String> {
         val token = authClient.getToken()
         if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
-                statusCode = token.statusCode,
-                message = "Failed to get token: ${token.message}"
+                statusCode = token.statusCode, message = "Failed to get token: ${token.message}"
             )
         }
         val data = userClientService.sendCode(
-            token.data.toString(),
-            UserClientSendRequest(phone = request.phone)
+            token.data.toString(), UserClientSendRequest(phone = request.phone)
         )
         return if (data.response.status.value() == HttpStatus.OK.value()) {
             ApiResult.success("", data.response.message)
@@ -45,8 +44,7 @@ class CustomerServiceImpl(
         val token = authClient.getToken()
         if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
-                statusCode = token.statusCode,
-                message = "Failed to get token: ${token.message}"
+                statusCode = token.statusCode, message = "Failed to get token: ${token.message}"
             )
         }
         val requestVerify = UserClientVerifyRequest(code = request.code, phone = request.phone)
@@ -81,7 +79,7 @@ class CustomerServiceImpl(
                 photo = "",
                 role = 1,
             )
-            val user = userService.userRegister(userLocalRequest)
+            val user = authService.register(userLocalRequest)
             if (user.statusCode != HttpStatus.OK.value()) {
                 return ApiResult.failed(user.statusCode, user.message)
             }
@@ -99,7 +97,8 @@ class CustomerServiceImpl(
                 tokenType = user.data!!.tokenType,
                 expiresIn = user.data!!.expiresIn,
                 role = user.data!!.role,
-                userQr = userQrResult.results.data
+                userQr = userQrResult.results.data,
+                refreshToken = user.data!!.refreshToken
             )
             return ApiResult.success(dataResult, data.response.message)
         } else {

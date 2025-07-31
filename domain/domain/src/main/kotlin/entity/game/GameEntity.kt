@@ -34,18 +34,4 @@ class GameEntity(
 
     @OneToMany(mappedBy = "game", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var gamePlays: MutableList<GameHistoryEntity> = mutableListOf()
-) : BaseEntity() {
-
-    // Default constructor required by JPA
-    constructor() : this(
-        name = "",
-        gameIcon = "",
-        gameUrl = "",
-        energy = 0,
-        description = "",
-        category = "",
-        threshold = 0,
-        userRewards = mutableListOf(),
-        gamePlays = mutableListOf()
-    )
-}
+) : BaseEntity()

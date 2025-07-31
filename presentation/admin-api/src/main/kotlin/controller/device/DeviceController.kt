@@ -22,9 +22,9 @@ class DeviceController(private val deviceService: DeviceService) {
     @GetMapping("device/{id}")
     suspend fun getDeviceById(@PathVariable id: String) = deviceService.getById(id)
 
-    //Create Device
-    @PostMapping("device")
-    suspend fun addDevice(@RequestBody request: DeviceRequest) = deviceService.addDevice(request)
+//    //Create Device
+//    @PostMapping("device")
+//    suspend fun addDevice(@RequestBody request: DeviceRequest) = deviceService.addDevice(request)
 
     //Update Device
     @PutMapping("device/{id}")

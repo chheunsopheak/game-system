@@ -31,51 +31,42 @@ class RewardServiceImpl(
         val token = authApiClient.getToken()
         if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
-                statusCode = token.statusCode,
-                message = "Failed to get token: ${token.message}"
+                statusCode = token.statusCode, message = "Failed to get token: ${token.message}"
             )
         }
         val data = rewardClient.getAllReward(token.data.toString())
         if (data.response.status != HttpStatus.OK) {
             return ApiResult.error(
-                data.response.status.value(),
-                "Failed to ${data.response.message}"
+                data.response.status.value(), "Failed to ${data.response.message}"
             )
         }
 
-        val result = data.results
-            .filter { it ->
-                it.item.any { item -> item.status == "PUBLISHED" }
-            }.map {
-                RewardResponse(
-                    name = it.name,
-                    photo = it.photo,
-                    description = it.description,
-                    ref = it.ref,
-                    merchant = MerchantRewardResponse(
-                        name = it.merchant.name, photo = it.merchant.photo
-                    ),
-                    startDate = it.startDate,
-                    endDate = it.endDate,
-                    weight = it.item.filter { item -> item.status == "PUBLISHED" }.size,
-                    item = it.item.filter { item -> item.status == "PUBLISHED" }
-                        .map { item ->
-                            RewardItemResponse(
-                                data = item.data,
-                                status = item.status
-                            )
-                        }
-                )
-            }
+        val result = data.results.filter { it ->
+            it.item.any { item -> item.status == "PUBLISHED" }
+        }.map {
+            RewardResponse(
+                name = it.name,
+                photo = it.photo,
+                description = it.description,
+                ref = it.ref,
+                merchant = MerchantRewardResponse(
+                    name = it.merchant.name, photo = it.merchant.photo
+                ),
+                startDate = it.startDate,
+                endDate = it.endDate,
+                weight = it.item.filter { item -> item.status == "PUBLISHED" }.size,
+                item = it.item.filter { item -> item.status == "PUBLISHED" }.map { item ->
+                    RewardItemResponse(
+                        data = item.data, status = item.status
+                    )
+                })
+        }
 
         return ApiResult.success(data = result, message = "Get all reward successful")
     }
 
     override suspend fun getUserReward(
-        filterBy: String?,
-        pageNumber: Int,
-        pageSize: Int,
-        searchString: String?
+        filterBy: String?, pageNumber: Int, pageSize: Int, searchString: String?
     ): PaginatedResult<UserRewardResponse> {
         val pageable = PageRequest.of(pageNumber - 1, pageSize)
         val spec = RewardFilterSpecification.rewardFilterSpecification(searchString)
@@ -98,16 +89,12 @@ class RewardServiceImpl(
         val data = reward.get()
         val response = RewardDetailResponse.from(data)
         return ApiResult.success(
-            data = response,
-            message = "Get reward successful"
+            data = response, message = "Get reward successful"
         )
     }
 
     override suspend fun getAllRewardByUser(
-        userId: String,
-        pageNumber: Int,
-        pageSize: Int,
-        searchString: String?
+        userId: String, pageNumber: Int, pageSize: Int, searchString: String?
     ): PaginatedResult<RewardByUserResponse> {
         val pageable = PageRequest.of(pageNumber - 1, pageSize)
         val spec = RewardFilterSpecification.rewardFilterSpecification(searchString)
@@ -123,9 +110,7 @@ class RewardServiceImpl(
     }
 
     override suspend fun getAllRewards(
-        pageNumber: Int,
-        pageSize: Int,
-        searchString: String?
+        pageNumber: Int, pageSize: Int, searchString: String?
     ): PaginatedResult<RewardHistoryResponse> {
         val pageable = PageRequest.of(pageNumber - 1, pageSize)
         val spec = RewardFilterSpecification.rewardFilterSpecification(searchString)
@@ -141,11 +126,9 @@ class RewardServiceImpl(
     }
 
     override suspend fun saveReward(request: UserRewardRequest): ApiResult<String> {
-        val user = userRepository.findByPhone(request.phone)
-            ?: return ApiResult.failed(
-                HttpStatus.NOT_FOUND.value(),
-                "Oops! That phone number doesn’t seem to be registered."
-            )
+        val user = userRepository.findByPhone(request.phone) ?: return ApiResult.failed(
+            HttpStatus.NOT_FOUND.value(), "Oops! That phone number doesn’t seem to be registered."
+        )
         val game = request.gameId?.let { gameRepository.findById(it).orElse(null) }
 
         val userReward = UserRewardEntity(
@@ -183,39 +166,45 @@ class RewardServiceImpl(
         val user = userRepository.findByPhone(request.phone)
         if (user == null) {
             return ApiResult.failed(
-                HttpStatus.NOT_FOUND.value(),
-                "Oops! That phone number doesn’t seem to be registered."
+                HttpStatus.NOT_FOUND.value(), "Oops! That phone number doesn’t seem to be registered."
             )
         }
 
         val token = authApiClient.getToken()
         if (token.statusCode != HttpStatus.OK.value()) {
             return ApiResult.error(
-                statusCode = token.statusCode,
-                message = "Failed to get token: ${token.message}"
+                statusCode = token.statusCode, message = "Failed to get token: ${token.message}"
             )
         }
         val requestData = ClaimRewardRequest(
-            phone = request.phone,
-            data = request.data
+            phone = request.phone, data = request.data
         )
         val claimRequest = rewardClient.claimReward(token.data.toString(), requestData)
-        if (claimRequest.response.status != HttpStatus.OK) {
-            return ApiResult.error(
-                statusCode = claimRequest.response.status.value(),
-                message = "Failed to claim reward: ${claimRequest.response.message}"
+        if (claimRequest.results.status == "00") {
+            return ApiResult.success(
+                data = null, message = "Reward claimed successfully"
             )
         }
-        return ApiResult.success(
-            data = null,
-            message = "Reward claimed successfully"
-        )
+        if (claimRequest.results.status == "01") {
+            return ApiResult.notFound(
+                message = "Reward not found or already claimed by another user"
+            )
+        }
+        if (claimRequest.results.status == "02") {
+            return ApiResult.notFound(
+                message = "This Reward Link not found"
+            )
+        }
+        if (claimRequest.results.status == "05") {
+            return ApiResult.error(
+                statusCode = HttpStatus.BAD_REQUEST.value(), message = " This Reward Link is not available"
+            )
+        }
+        return ApiResult.internalError(message = "Internal server error while claiming reward")
     }
 
     override suspend fun rewardPicker(
-        threshold: Int,
-        playCount: Int,
-        rewards: List<RewardResponse>
+        threshold: Int, playCount: Int, rewards: List<RewardResponse>
     ): ApiResult<RewardResponse> {
         if (playCount + 1 >= threshold) {
             val progress = (playCount - threshold).coerceAtLeast(0)
@@ -229,17 +218,15 @@ class RewardServiceImpl(
             }
 
             val sortedWeights = rewards.map { it.weight }.sorted()
-            val cutoffIndex = (sortedWeights.size * cutoffPercent)
-                .toInt()
-                .coerceAtLeast(1)
-                .coerceAtMost(sortedWeights.size - 1)
+            val cutoffIndex =
+                (sortedWeights.size * cutoffPercent).toInt().coerceAtLeast(1).coerceAtMost(sortedWeights.size - 1)
 
             val cutoffWeight = sortedWeights.getOrNull(cutoffIndex)
                 ?: return ApiResult.notFound("No reward found with calculated cutoff.")
 
             val candidates = rewards.filter { it.weight <= cutoffWeight }
-            val selected = candidates.randomOrNull()
-                ?: return ApiResult.notFound("No eligible reward in cutoff candidates.")
+            val selected =
+                candidates.randomOrNull() ?: return ApiResult.notFound("No eligible reward in cutoff candidates.")
 
             return ApiResult.success(selected, "Reward picked based on progress.")
         }

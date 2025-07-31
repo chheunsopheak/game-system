@@ -24,7 +24,7 @@ data class UserGameHistoryResponse(
                 gameIcon = entity.game!!.gameIcon,
                 userId = entity.user!!.id,
                 userName = entity.user!!.name,
-                userPhoto = entity.user!!.photo,
+                userPhoto = entity.user!!.photoUrl,
                 deviceId = entity.device,
                 energy = entity.energy,
                 playedAt = entity.playedAt

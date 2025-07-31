@@ -10,7 +10,7 @@ data class PaginatedResult<T>(
     val totalPages: Int,
     val hasPreviousPage: Boolean,
     val hasNextPage: Boolean,
-    val statusCode: HttpStatus,
+    val statusCode: Int,
     val message: String,
     val succeeded: Boolean
 ) {
@@ -31,7 +31,7 @@ data class PaginatedResult<T>(
                 totalPages = totalPages,
                 hasPreviousPage = pageNumber > 1,
                 hasNextPage = pageNumber < totalPages,
-                statusCode = HttpStatus.OK,
+                statusCode = HttpStatus.OK.value(),
                 message = message,
                 succeeded = true
             )
@@ -50,7 +50,7 @@ data class PaginatedResult<T>(
                 totalPages = 0,
                 hasPreviousPage = false,
                 hasNextPage = false,
-                statusCode = statusCode,
+                statusCode = statusCode.value(),
                 message = message,
                 succeeded = false
             )

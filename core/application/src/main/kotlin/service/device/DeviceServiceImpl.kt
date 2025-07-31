@@ -49,44 +49,44 @@ class DeviceServiceImpl(
         return response
     }
 
-    override fun addDevice(request: DeviceRequest): ApiResult<String> {
-        val requestAddUser = CreateUserRequest(
-            username = NumGenerator.generateNo("D"),
-            email = NumGenerator.generateNo("D"),
-            password = request.password,
-            name = request.deviceName,
-            photo = request.photo ?: "",
-            phone = "855" + NumGenerator.generateNo("5"),
-            role = 1
-        )
-        val savedUser = userService.userRegister(requestAddUser)
-        if (savedUser.statusCode != HttpStatus.OK.value()) {
-            return ApiResult.failed(
-                savedUser.statusCode,
-                savedUser.message ?: "Failed to save user"
-            )
-        }
-        val user = userRepository.findById(savedUser.data!!.userId)
-
-        if (user == null) {
-            return ApiResult.failed(
-                HttpStatus.NOT_FOUND.value(),
-                "Failed to save user"
-            )
-        }
-        val requestDevice = DeviceEntity(
-            deviceId = request.deviceId,
-            deviceName = request.deviceName,
-            deviceType = request.deviceType,
-            osVersion = request.osVersion,
-            ipAddress = request.ipAddress,
-            lastOnlineAt = LocalDateTime.now(),
-            registeredAt = LocalDateTime.now(),
-            user = user.get()
-        )
-        deviceRepository.save(requestDevice)
-        return ApiResult.success(requestDevice.id, "Device added successfully")
-    }
+//    override fun addDevice(request: DeviceRequest): ApiResult<String> {
+//        val requestAddUser = CreateUserRequest(
+//            username = NumGenerator.generateNo("D"),
+//            email = NumGenerator.generateNo("D"),
+//            password = request.password,
+//            name = request.deviceName,
+//            photo = request.photo ?: "",
+//            phone = "855" + NumGenerator.generateNo("5"),
+//            role = 1
+//        )
+//        val savedUser = userService.userRegister(requestAddUser)
+//        if (savedUser.statusCode != HttpStatus.OK.value()) {
+//            return ApiResult.failed(
+//                savedUser.statusCode,
+//                savedUser.message ?: "Failed to save user"
+//            )
+//        }
+//        val user = userRepository.findById(savedUser.data!!.userId)
+//
+//        if (user == null) {
+//            return ApiResult.failed(
+//                HttpStatus.NOT_FOUND.value(),
+//                "Failed to save user"
+//            )
+//        }
+//        val requestDevice = DeviceEntity(
+//            deviceId = request.deviceId,
+//            deviceName = request.deviceName,
+//            deviceType = request.deviceType,
+//            osVersion = request.osVersion,
+//            ipAddress = request.ipAddress,
+//            lastOnlineAt = LocalDateTime.now(),
+//            registeredAt = LocalDateTime.now(),
+//            user = user.get()
+//        )
+//        deviceRepository.save(requestDevice)
+//        return ApiResult.success(requestDevice.id, "Device added successfully")
+//    }
 
     override fun updateDevice(
         id: String,

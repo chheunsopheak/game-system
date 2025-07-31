@@ -7,7 +7,7 @@ spring:
   output:
     ansi.enabled: ALWAYS
   datasource:
-    url: jdbc:mysql://68.183.177.52:3306/game-production?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://68.183.177.52:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: GameHub@2025
     driver-class-name: com.mysql.cj.jdbc.Driver

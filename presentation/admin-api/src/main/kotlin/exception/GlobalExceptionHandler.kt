@@ -71,8 +71,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException::class)
     fun handleUnauthorized(
-        ex: BadCredentialsException,
-        request: HttpServletRequest
+        ex: BadCredentialsException, request: HttpServletRequest
     ): ApiResult<ErrorResult> {
         logger.warning("Unauthorized access attempt: ${request.requestURI} - ${ex.message}")
         return ApiResult.error(HttpStatus.UNAUTHORIZED.value(), "Unauthorized: ${ex.message}")

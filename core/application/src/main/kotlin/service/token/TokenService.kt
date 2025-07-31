@@ -10,6 +10,4 @@ interface TokenService {
     fun getUserId(token: String): String?
     fun getUserName(): String
     fun getToken(): String
-    fun saveUserToken(userId: String, token: String): Boolean
-
 }

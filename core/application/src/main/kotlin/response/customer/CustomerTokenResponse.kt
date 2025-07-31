@@ -6,5 +6,6 @@ data class CustomerTokenResponse(
     val expiresIn: Long,
     val tokenType: String,
     val role: String,
-    val userQr: String
+    val userQr: String,
+    val refreshToken: String
 )

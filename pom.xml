@@ -24,6 +24,7 @@
         <module>infrastructure/external</module>
         <module>infrastructure/persistence</module>
         <module>infrastructure/security</module>
+        <module>infrastructure/firebase</module>
     </modules>
 
     <dependencyManagement>

@@ -19,7 +19,7 @@ data class UserResponse(
             email = user.email,
             name = user.name,
             isActive = user.isActive,
-            photo = user.photo,
+            photo = user.photoUrl,
             phone = user.phone,
             energy = user.energy
         )

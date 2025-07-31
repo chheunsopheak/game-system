@@ -78,6 +78,7 @@
     </build>
 
     <dependencies>
+
         <!-- commons-csv -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -139,6 +140,12 @@
         <dependency>
             <groupId>com.gamesystem</groupId>
             <artifactId>security</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gamesystem</groupId>
+            <artifactId>firebase</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

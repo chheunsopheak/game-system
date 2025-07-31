@@ -53,20 +53,4 @@ class UserRewardEntity(
 
     @Column(name = "is_claimed", nullable = false)
     var isClaimed: Boolean = false,
-) : BaseEntity() {
-    constructor() : this(
-        user = UserEntity(),
-        game = null,
-        gameName = null,
-        deviceId = null,
-        photo = "",
-        phone = "",
-        description = "",
-        ref = "",
-        merchantName = "",
-        rewardName = "",
-        rewardUrl = "",
-        claimedAt = LocalDateTime.now(),
-        isClaimed = false
-    )
-}
+) : BaseEntity()

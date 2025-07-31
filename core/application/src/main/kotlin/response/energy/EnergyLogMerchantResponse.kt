@@ -23,8 +23,8 @@ data class EnergyLogMerchantResponse(
                 merchantName = entity.merchant.name,
                 userId = entity.user.id,
                 userName = entity.user.name,
-                userProfile = entity.user.photo.toString(),
-                userPhone = entity.user.photo.toString(),
+                userProfile = entity.user.photoUrl.toString(),
+                userPhone = entity.user.phone,
                 value = entity.value,
                 operation = entity.note?.toInt() ?: 0,
                 createdAt = entity.createdAt

@@ -5,6 +5,7 @@ import jwt.JwtTokenProvider
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
+import repository.token.UserTokenRepository
 import repository.user.UserRepository
 import response.TokenResponse
 import service.UserPrinciple
@@ -15,7 +16,8 @@ import java.util.*
 class TokenServiceImpl(
     private val userRepository: UserRepository,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val request: HttpServletRequest
+    private val request: HttpServletRequest,
+    private val userTokenRepository: UserTokenRepository
 ) : TokenService {
     override fun generateToken(userId: String): TokenResponse {
         val user = userRepository.findById(userId)
@@ -49,21 +51,17 @@ class TokenServiceImpl(
 
     override fun getUserName(): String {
         val token = getToken()
-        return jwtTokenProvider.extractClaims(token)
-            .get("username", String::class.java)
+        return jwtTokenProvider.extractClaims(token).get("username", String::class.java)
     }
 
     override fun getToken(): String {
-        val authHeader = request.getHeader("Authorization")
-            ?: throw HttpClientErrorException(
-                HttpStatus.UNAUTHORIZED,
-                "Authorization header is missing"
-            )
+        val authHeader = request.getHeader("Authorization") ?: throw HttpClientErrorException(
+            HttpStatus.UNAUTHORIZED, "Authorization header is missing"
+        )
 
         if (!authHeader.startsWith("Bearer ")) {
             throw HttpClientErrorException(
-                HttpStatus.UNAUTHORIZED,
-                "Authorization header must start with 'Bearer '"
+                HttpStatus.UNAUTHORIZED, "Authorization header must start with 'Bearer '"
             )
         }
 
@@ -71,14 +69,9 @@ class TokenServiceImpl(
 
         if (jwtToken.count { it == '.' } != 2) {
             throw HttpClientErrorException(
-                HttpStatus.UNAUTHORIZED,
-                "Invalid JWT token format"
+                HttpStatus.UNAUTHORIZED, "Invalid JWT token format"
             )
         }
         return jwtToken
-    }
-
-    override fun saveUserToken(userId: String, token: String): Boolean {
-        TODO("Not yet implemented")
     }
 }

@@ -12,23 +12,22 @@ import jakarta.persistence.Table
 class MemberEntity(
     @Column(name = "name")
     val name: String,
+
     @Column(name = "email")
     val email: String?,
+
     @Column(name = "phone")
     val phone: String,
+
     @Column(name = "ticket")
     val ticket: Int,
+
     @Column(name = "reward_type")
     val rewardType: String,
+
+    @Column(name = "no")
+    val no: Int = 0,
+
     @OneToMany(mappedBy = "member")
     var contests: MutableList<ContestEntity> = mutableListOf()
-) : BaseEntity() {
-    constructor() : this(
-        name = "",
-        email = null,
-        phone = "",
-        ticket = 0,
-        rewardType = "",
-        contests = mutableListOf()
-    )
-}
+) : BaseEntity()

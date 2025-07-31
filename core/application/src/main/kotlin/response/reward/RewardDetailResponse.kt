@@ -27,7 +27,7 @@ data class RewardDetailResponse(
             rewardUrl = reward.rewardUrl,
             rewardPhoto = reward.photo,
             userName = reward.user.name,
-            userPhoto = reward.user.photo,
+            userPhoto = reward.user.photoUrl,
             phone = reward.user.phone.orEmpty(),
             merchantName = reward.merchantName,
             ref = reward.ref,

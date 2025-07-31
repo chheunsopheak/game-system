@@ -18,6 +18,12 @@ object NumGenerator {
         return "$text$date$randomSuffix"
     }
 
+    fun generateCode(text: String): String {
+        val randomNumber = Random.nextInt(0, 10000)
+        val formattedNumber = randomNumber.toString().padStart(4, '0')
+        return "$text$formattedNumber"
+    }
+
     fun generateEmail(prefix: String = "user", domain: String = "example.com"): String {
         val uniquePart = generateRandomNumber(6)
         return "$prefix$uniquePart@$domain"

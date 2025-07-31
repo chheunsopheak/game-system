@@ -10,11 +10,7 @@ class ContestEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     var member: MemberEntity,
+
     @Column(name = "description", nullable = false)
     val description: String
-) : BaseEntity() {
-    constructor() : this(
-        member = MemberEntity(),
-        description = ""
-    )
-}
+) : BaseEntity()

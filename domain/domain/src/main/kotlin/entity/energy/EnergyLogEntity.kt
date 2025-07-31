@@ -22,12 +22,4 @@ data class EnergyLogEntity(
 
     @Column(name = "note")
     var note: String? = null,
-) : BaseEntity() {
-    constructor() : this(
-        merchant = MerchantEntity(),
-        user = UserEntity(),
-        value = 0,
-        note = null
-    )
-
-}
+) : BaseEntity()
