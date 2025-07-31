@@ -6,8 +6,8 @@ import com.google.firebase.messaging.MulticastMessage
 import com.google.firebase.messaging.Notification
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import request.FirebaseRequest
 import request.FirebaseBroadcastRequest
+import request.FirebaseRequest
 import wrapper.ApiResult
 
 @Service

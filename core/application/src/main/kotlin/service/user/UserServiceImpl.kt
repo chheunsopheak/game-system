@@ -1,6 +1,5 @@
 package service.user
 
-import common.UserRoleHelper
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder

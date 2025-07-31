@@ -1,7 +1,5 @@
 package request.notification
 
-import jakarta.annotation.Priority
-
 data class NotificationRequest(
     val targetId: String,
     val type: String,

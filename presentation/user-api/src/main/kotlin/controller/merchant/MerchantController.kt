@@ -3,8 +3,8 @@ package com.gamesystem.controller.merchant
 import constant.BaseUrl
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import request.merchant.MerchantModeRequest
 import request.auth.LoginRequest
+import request.merchant.MerchantModeRequest
 import request.user.UserChangePasswordRequest
 import response.merchant.MerchantLoginResponse
 import response.merchant.MyMerchantResponse

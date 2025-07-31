@@ -1,21 +1,17 @@
 package service.device
 
-import entity.device.DeviceEntity
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import repository.device.DeviceRepository
 import repository.user.UserRepository
 import request.device.DeviceRequest
-import request.user.CreateUserRequest
 import response.device.DeviceDetailResponse
 import response.device.DeviceResponse
 import service.user.UserService
 import specification.device.DeviceFilterSpecification
-import util.NumGenerator
 import wrapper.ApiResult
 import wrapper.PaginatedResult
-import java.time.LocalDateTime
 
 @Service
 class DeviceServiceImpl(

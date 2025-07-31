@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service
 import repository.merchant.MerchantRepository
 import repository.store.StoreRepository
 import repository.user.UserRepository
+import request.auth.LoginRequest
 import request.merchant.MerchantModeRequest
 import request.merchant.MerchantRequest
 import request.merchant.MerchantUpdateRequest
-import request.auth.LoginRequest
 import response.merchant.MerchantDetailResponse
 import response.merchant.MerchantLoginResponse
 import response.merchant.MerchantResponse

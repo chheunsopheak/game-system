@@ -1,12 +1,9 @@
 package service.user
 
-import request.user.CreateUserRequest
-import request.auth.LoginRequest
 import request.user.UpdateUserRequest
 import request.user.UserChangePasswordRequest
 import response.user.UserDetailResponse
 import response.user.UserResponse
-import response.user.UserTokenResponse
 import wrapper.ApiResult
 import wrapper.PaginatedResult
 

@@ -3,9 +3,6 @@ package com.gamesystem.controller.user
 import constant.BaseUrl
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import request.auth.ChangePasswordRequest
-import request.user.CreateUserRequest
-import request.auth.LoginRequest
 import request.user.UpdateUserRequest
 import request.user.UserChangePasswordRequest
 import service.user.UserService

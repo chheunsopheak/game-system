@@ -3,7 +3,6 @@ package entity.user
 import contract.BaseEntity
 import entity.role.RoleEntity
 import jakarta.persistence.*
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "user_roles")

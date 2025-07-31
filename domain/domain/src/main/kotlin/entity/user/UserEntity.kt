@@ -7,7 +7,6 @@ import entity.history.GameHistoryEntity
 import entity.merchant.MerchantEntity
 import entity.notification.NotificationEntity
 import entity.reward.UserRewardEntity
-import entity.user.UserTokenEntity
 import jakarta.persistence.*
 import java.time.LocalDateTime
 

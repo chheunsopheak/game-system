@@ -2,11 +2,7 @@ package entity.role
 
 import contract.BaseEntity
 import entity.user.UserRoleEntity
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "role")

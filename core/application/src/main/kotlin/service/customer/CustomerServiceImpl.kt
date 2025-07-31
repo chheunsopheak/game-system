@@ -14,7 +14,6 @@ import response.customer.CustomerVerifyResponse
 import service.auth.AuthClientService
 import service.auth.AuthService
 import service.user.UserClientService
-import service.user.UserService
 import wrapper.ApiResult
 
 @Service

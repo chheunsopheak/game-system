@@ -1,10 +1,9 @@
 package service.auth
 
 import request.auth.ChangePasswordRequest
-import request.auth.RefreshTokenRequest
 import request.auth.LoginRequest
+import request.auth.RefreshTokenRequest
 import request.user.CreateUserRequest
-import response.TokenResponse
 import response.user.UserTokenResponse
 import wrapper.ApiResult
 
