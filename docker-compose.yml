@@ -5,22 +5,21 @@ services:
       dockerfile: presentation/admin-api/Dockerfile
     container_name: game-system-admin-api
     ports:
-      - "5000:5001"
+      - "5001:5001"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - SERVER_PORT=5003
-      # Use internal Docker network service name for database
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      # Database configuration
+      - SPRING_DATASOURCE_URL=jdbc:mysql://68.183.177.52:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=GameHub@2025 # Use .env or Docker Secrets in production
+      - SPRING_DATASOURCE_PASSWORD=GameHub@2025
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      # Redis configuration (if using Redis for caching/sessions)
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
     depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - mysql
+      - redis
     networks:
       - game-system-network
     restart: unless-stopped
@@ -37,22 +36,21 @@ services:
       dockerfile: presentation/user-api/Dockerfile
     container_name: game-system-user-api
     ports:
-      - "5000:5002"
+      - "5000:5000"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_PORT=5002
-      # Use internal Docker network service name for database
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      # Database configuration
+      - SPRING_DATASOURCE_URL=jdbc:mysql://68.183.177.52:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=GameHub@2025
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      # Redis configuration (if using Redis for caching/sessions)
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
     depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - mysql
+      - redis
     networks:
       - game-system-network
     restart: unless-stopped
@@ -71,6 +69,8 @@ services:
       - MYSQL_DATABASE=game-development
       - MYSQL_USER=root
       - MYSQL_PASSWORD=GameHub@2025
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
     ports:
       - "3307:3306"
     volumes:
@@ -81,7 +81,7 @@ services:
     restart: unless-stopped
     command: --default-authentication-plugin=mysql_native_password
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pGameHub@2025" ]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "game_user", "-pgame_password" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -98,12 +98,6 @@ services:
       - game-system-network
     restart: unless-stopped
     command: redis-server --appendonly yes
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
 volumes:
   mysql_data:
