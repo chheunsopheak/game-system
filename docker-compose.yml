@@ -5,7 +5,7 @@ services:
       dockerfile: presentation/admin-api/Dockerfile
     container_name: game-system-admin-api
     ports:
-      - "5003:5003"
+      - "5001:5001"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - SERVER_PORT=5003
@@ -36,7 +36,7 @@ services:
       dockerfile: presentation/user-api/Dockerfile
     container_name: game-system-user-api
     ports:
-      - "5002:5002"
+      - "5000:5000"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_PORT=5002
@@ -72,7 +72,7 @@ services:
       - MYSQL_CHARACTER_SET_SERVER=utf8mb4
       - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init-scripts:/docker-entrypoint-initdb.d
