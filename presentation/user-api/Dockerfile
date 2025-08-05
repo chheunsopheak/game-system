@@ -8,6 +8,7 @@ COPY share/shared/pom.xml ./share/shared/
 COPY domain/domain/pom.xml ./domain/domain/
 COPY core/application/pom.xml ./core/application/
 COPY infrastructure/external/pom.xml ./infrastructure/external/
+COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
 COPY infrastructure/persistence/pom.xml ./infrastructure/persistence/
 COPY infrastructure/security/pom.xml ./infrastructure/security/
 RUN mvn dependency:go-offline -B
