@@ -49,10 +49,18 @@
                         <plugin>no-arg</plugin>
                     </compilerPlugins>
                     <pluginOptions>
-                        <!-- Apply no-arg to JPA classes -->
                         <option>no-arg:annotation=jakarta.persistence.Entity</option>
+                        <option>no-arg:annotation=jakarta.persistence.Embeddable</option>
+                        <option>no-arg:annotation=jakarta.persistence.MappedSuperclass</option>
                     </pluginOptions>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- Optional Spring Boot plugin -->

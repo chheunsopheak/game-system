@@ -18,19 +18,30 @@ spring:
       idle-timeout: 300000
       max-lifetime: 1200000
   jpa:
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
     hibernate:
       ddl-auto: update
-    open-in-view: true
-    show-sql: true
-  management:
-    endpoint:
-      health:
-        show-details: always
-    endpoints:
-      web:
-        exposure:
-          include: health,info,metrics
-  logging:
-    level:
-      org.springframework:
-        security: DEBUG
+  h2:
+    console:
+      enabled: true
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+logging:
+  level:
+    root: INFO
+    filter: DEBUG
+    user: DEBUG
+    jwt: DEBUG
+    io.jsonwebtoken: DEBUG
+    org.springframework.security: DEBUG
