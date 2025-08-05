@@ -43,7 +43,7 @@ USER appuser
 COPY --from=builder /app/presentation/user-api/target/user-api-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Expose the application's port
-EXPOSE 5002
+EXPOSE 5000
 
 # Command to run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

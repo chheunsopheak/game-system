@@ -44,7 +44,7 @@ USER appuser
 COPY --from=builder /app/presentation/admin-api/target/admin-api-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Define the port the container will listen on.
-EXPOSE 5003
+EXPOSE 5001
 
 # Command to run the application.
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
