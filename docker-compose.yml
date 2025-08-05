@@ -44,7 +44,7 @@ services:
       # Use internal Docker network service name for database
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=GameHub@2025 # Use .env or Docker Secrets in production
+      - SPRING_DATASOURCE_PASSWORD=GameHub@2025
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
@@ -70,7 +70,7 @@ services:
       - MYSQL_ROOT_PASSWORD=GameHub@2025
       - MYSQL_DATABASE=game-development
       - MYSQL_USER=root
-      - MYSQL_PASSWORD=GameHub@2025=
+      - MYSQL_PASSWORD=GameHub@2025
     ports:
       - "3307:3306"
     volumes:
