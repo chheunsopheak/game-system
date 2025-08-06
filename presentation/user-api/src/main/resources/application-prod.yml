@@ -1,7 +1,6 @@
 server:
-  port: 5000
+  port: 5002
 spring:
-  profiles: prod
   application:
     name: game-system
   output:

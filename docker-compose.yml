@@ -1,47 +1,43 @@
 services:
   admin-api:
     build:
-      context: ./
+      context: .
       dockerfile: presentation/admin-api/Dockerfile
-    container_name: game-system-admin-api
+    container_name: game-admin-api
     environment:
-      - DATABASE_URL=jdbc:mysql://68.183.177.52:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - DATABASE_USERNAME=root
-      - DATABASE_PASSWORD=GameHub@2025
-      - SERVER_PORT=5001
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - SERVER_PORT=5002
     ports:
-      - "5001:5001"
+      - "5002:5002"
+    volumes:
+      - maven-repo:/root/.m2/repository
     networks:
-      - game-network
+      - game-system-network
     restart: unless-stopped
 
   user-api:
     build:
-      context: ./
+      context: .
       dockerfile: presentation/user-api/Dockerfile
-    container_name: game-system-user-api
+    container_name: game-user-api
     environment:
-      - DATABASE_URL=jdbc:mysql://68.183.177.52:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - DATABASE_USERNAME=root
-      - DATABASE_PASSWORD=GameHub@2025
-      - SERVER_PORT=8004
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - SERVER_PORT=5001
     ports:
-      - "8004:8004"
+      - "5001:5001"
+    volumes:
+      - maven-repo:/root/.m2/repository
     networks:
-      - game-network
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    container_name: game-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - game-network
+      - game-system-network
     restart: unless-stopped
 
 volumes:
-  mysql_data:
+  maven-repo:
+
 networks:
-  game-network:
+  game-system-network:
     driver: bridge

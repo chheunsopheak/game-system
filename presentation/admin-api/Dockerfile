@@ -1,44 +1,46 @@
-# syntax=docker/dockerfile:1.4
+# Stage 1: Build
+FROM maven:3.9.5-eclipse-temurin-21 AS build
 
-# Stage 1: The Build Stage
-FROM maven:3.9-eclipse-temurin-21 AS builder
-
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy all project object model (pom) files
+# Copy only pom.xml files first for better layer caching
 COPY pom.xml .
-COPY presentation/admin-api/pom.xml ./presentation/admin-api/
-COPY presentation/user-api/pom.xml ./presentation/user-api/
-COPY share/shared/pom.xml ./share/shared/
-COPY domain/domain/pom.xml ./domain/domain/
 COPY core/application/pom.xml ./core/application/
-COPY infrastructure/external/pom.xml ./infrastructure/external/
-COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
+COPY domain/domain/pom.xml ./domain/domain/
 COPY infrastructure/persistence/pom.xml ./infrastructure/persistence/
 COPY infrastructure/security/pom.xml ./infrastructure/security/
+COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
+COPY infrastructure/external/pom.xml ./infrastructure/external/
+COPY share/shared/pom.xml ./share/shared/
+COPY presentation/admin-api/pom.xml ./presentation/admin-api/
+COPY presentation/user-api/pom.xml ./presentation/user-api/
 
-# Preload Maven dependencies (will be cached unless pom.xml changes)
+# Download all dependencies first (faster rebuilds if code changes)
 RUN mvn dependency:go-offline -B
 
-# Copy full source
+# Now copy all source files
 COPY core ./core
 COPY domain ./domain
 COPY infrastructure ./infrastructure
-COPY share ./shared
+COPY share ./share
 COPY presentation ./presentation
 
-# Build everything so inter-module dependencies are resolved
+# Build the full project
 RUN mvn clean install -DskipTests
 
-# Stage 2: Runtime image
+# Stage 2: Runtime
 FROM openjdk:21-jdk-slim
+
+# Use a non-root user (optional but recommended for security)
+RUN useradd -m appuser
+USER appuser
 
 WORKDIR /app
 
-# Copy just the final jar
-COPY --from=builder /app/presentation/admin-api/target/admin-api-0.0.1-SNAPSHOT.jar .
+# Copy only the built JAR
+COPY --from=build /app/presentation/admin-api/target/admin-api-0.0.1-SNAPSHOT.jar app.jar
 
-EXPOSE 50001
+EXPOSE 5002
 
-CMD ["java", "-jar", "admin-api-0.0.1-SNAPSHOT.jar"]
+# Run the JAR
+CMD ["java", "-jar", "app.jar"]

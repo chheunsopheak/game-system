@@ -1,40 +1,43 @@
-# Stage 1: The Build Stage
-FROM maven:3.9-eclipse-temurin-21 AS builder
+# Stage 1: Build
+FROM maven:3.9.5-eclipse-temurin-21 AS build
 
-# Set the working directory for the build
 WORKDIR /app
 
-# Copy all pom.xml
+# Copy pom.xml files to cache dependencies
 COPY pom.xml .
-COPY presentation/admin-api/pom.xml ./presentation/admin-api/
-COPY presentation/user-api/pom.xml ./presentation/user-api/
-COPY share/shared/pom.xml ./share/shared/
-COPY domain/domain/pom.xml ./domain/domain/
 COPY core/application/pom.xml ./core/application/
-COPY infrastructure/external/pom.xml ./infrastructure/external/
-COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
+COPY domain/domain/pom.xml ./domain/domain/
 COPY infrastructure/persistence/pom.xml ./infrastructure/persistence/
 COPY infrastructure/security/pom.xml ./infrastructure/security/
+COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
+COPY infrastructure/external/pom.xml ./infrastructure/external/
+COPY share/shared/pom.xml ./share/shared/
+COPY presentation/admin-api/pom.xml ./presentation/admin-api/
+COPY presentation/user-api/pom.xml ./presentation/user-api/
 
-# Preload Maven dependencies (will be cached unless pom.xml changes)
+# Preload dependencies
 RUN mvn dependency:go-offline -B
 
 # Copy full source
 COPY core ./core
 COPY domain ./domain
 COPY infrastructure ./infrastructure
-COPY share ./shared
+COPY share ./share
 COPY presentation ./presentation
 
-# Build everything so inter-module dependencies are resolved
+# Build the entire project
 RUN mvn clean install -DskipTests
 
-# Stage 2: Runtime image
+# Stage 2: Runtime
 FROM openjdk:21-jdk-slim
+
+RUN useradd -m appuser
+USER appuser
 
 WORKDIR /app
 
-# Copy just the final jar
-COPY --from=builder /app/presentation/user-api/target/user-api-0.0.1-SNAPSHOT.jar .
-EXPOSE 5000
-CMD ["java", "-jar", "user-api-0.0.1-SNAPSHOT.jar"]
+COPY --from=build /app/presentation/user-api/target/user-api-0.0.1-SNAPSHOT.jar app.jar
+
+EXPOSE 5001
+
+CMD ["java", "-jar", "app.jar"]
