@@ -6,7 +6,7 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy all project object model (pom) files=
+# Copy all project object model (pom) files
 COPY pom.xml .
 COPY presentation/admin-api/pom.xml ./presentation/admin-api/
 COPY presentation/user-api/pom.xml ./presentation/user-api/
@@ -18,33 +18,27 @@ COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
 COPY infrastructure/persistence/pom.xml ./infrastructure/persistence/
 COPY infrastructure/security/pom.xml ./infrastructure/security/
 
-# Download all project dependencies. This layer is highly cacheable.
+# Preload Maven dependencies (will be cached unless pom.xml changes)
 RUN mvn dependency:go-offline -B
 
-# Copy the rest of the source code.
-COPY . .
+# Copy full source
+COPY core ./core
+COPY domain ./domain
+COPY infrastructure ./infrastructure
+COPY share ./shared
+COPY presentation ./presentation
 
-# Build and package the specific application.
-RUN mvn clean package -pl presentation/admin-api -am -DskipTests
+# Build everything so inter-module dependencies are resolved
+RUN mvn clean install -DskipTests
 
-# Stage 2: The Runtime Stage
-FROM eclipse-temurin:21-jre-alpine
+# Stage 2: Runtime image
+FROM openjdk:21-jdk-slim
 
-# Set the working directory for the runtime container
 WORKDIR /app
 
-# Install 'curl' for the health check. Using Alpine's package manager 'apk'.
-RUN apk update && apk add --no-cache curl
+# Copy just the final jar
+COPY --from=builder /app/presentation/admin-api/target/admin-api-0.0.1-SNAPSHOT.jar .
 
-# Create a non-root user for security best practices
-RUN addgroup -S appuser && adduser -S appuser -G appuser
-USER appuser
+EXPOSE 50001
 
-# Copy the final JAR file from the 'builder' stage.
-COPY --from=builder /app/presentation/admin-api/target/admin-api-0.0.1-SNAPSHOT.jar /app/app.jar
-
-# Define the port the container will listen on.
-EXPOSE 5001
-
-# Command to run the application.
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "admin-api-0.0.1-SNAPSHOT.jar"]

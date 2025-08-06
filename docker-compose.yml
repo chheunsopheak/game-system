@@ -1,118 +1,51 @@
 services:
   admin-api:
     build:
-      context: .
+      context: ./
       dockerfile: presentation/admin-api/Dockerfile
     container_name: game-system-admin-api
+    environment:
+      - DATABASE_URL=jdbc:mysql://68.183.177.52:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=GameHub@2025
+      - SERVER_PORT=5001
     ports:
       - "5001:5001"
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - SERVER_PORT=5001
-      # Database configuration - USE INTERNAL SERVICE NAME
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=GameHub@2025 # Use .env or Docker Secrets in production
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      # Redis configuration
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
     depends_on:
-      mysql:
-        condition: service_healthy # Wait until MySQL is fully ready
-      redis:
-        condition: service_healthy # Wait until Redis is fully ready
+      - mysql
     networks:
-      - game-system-network
+      - game-network
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:5001/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   user-api:
     build:
-      context: .
+      context: ./
       dockerfile: presentation/user-api/Dockerfile
     container_name: game-system-user-api
-    ports:
-      - "5000:5000"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=5000
-      # Database configuration - USE INTERNAL SERVICE NAME
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=GameHub@2025 # Use .env or Docker Secrets in production
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      # Redis configuration
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
+      - DATABASE_URL=jdbc:mysql://68.183.177.52:3306/game-development?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=GameHub@2025
+      - SERVER_PORT=8004
+    ports:
+      - "8004:8004"
     depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - mysql
     networks:
-      - game-system-network
+      - game-network
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:5000/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  mysql:
-    image: mysql:8.0
-    container_name: game-system-mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=GameHub@2025
-      - MYSQL_DATABASE=game-development
-      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
-      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init-scripts:/docker-entrypoint-initdb.d
-    networks:
-      - game-system-network
-    restart: unless-stopped
-    command: --default-authentication-plugin=mysql_native_password
-    healthcheck:
-      # CORRECTED: Use root user and its password for the check
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pGameHub@2025" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
   redis:
     image: redis:7-alpine
-    container_name: game-system-redis
+    container_name: game-redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     networks:
-      - game-system-network
+      - game-network
     restart: unless-stopped
-    command: redis-server --appendonly yes
-    healthcheck:
-      # ADDED: Healthcheck for Redis
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
 volumes:
   mysql_data:
-  redis_data:
-
 networks:
-  game-system-network:
+  game-network:
     driver: bridge

@@ -16,34 +16,25 @@ COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
 COPY infrastructure/persistence/pom.xml ./infrastructure/persistence/
 COPY infrastructure/security/pom.xml ./infrastructure/security/
 
-# Download all dependencies. This step is highly cacheable.
+# Preload Maven dependencies (will be cached unless pom.xml changes)
 RUN mvn dependency:go-offline -B
 
-# Copy the rest of the source code
-COPY . .
+# Copy full source
+COPY core ./core
+COPY domain ./domain
+COPY infrastructure ./infrastructure
+COPY share ./shared
+COPY presentation ./presentation
 
-# Build the application, specifying the target module and its dependencies.=
-RUN mvn clean package -pl presentation/user-api -am -DskipTests
+# Build everything so inter-module dependencies are resolved
+RUN mvn clean install -DskipTests
 
-# Stage 2: The Runtime Stage
-# Use a lightweight JRE image for the final container.
-FROM eclipse-temurin:21-jre-alpine
+# Stage 2: Runtime image
+FROM openjdk:21-jdk-slim
 
-# Set the working directory in the final image
 WORKDIR /app
 
-# Install curl for health checks (using Alpine's package manager)
-RUN apk add --no-cache curl
-
-# Create a dedicated user for security
-RUN addgroup -S appuser && adduser -S appuser -G appuser
-USER appuser
-
-# Copy the final JAR from the build stage to the runtime image.
-COPY --from=builder /app/presentation/user-api/target/user-api-0.0.1-SNAPSHOT.jar /app/app.jar
-
-# Expose the application's port
+# Copy just the final jar
+COPY --from=builder /app/presentation/user-api/target/user-api-0.0.1-SNAPSHOT.jar .
 EXPOSE 5000
-
-# Command to run the application
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "user-api-0.0.1-SNAPSHOT.jar"]
