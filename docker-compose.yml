@@ -11,8 +11,6 @@ services:
       - SERVER_PORT=5001
     ports:
       - "5001:5001"
-    depends_on:
-      - mysql
     networks:
       - game-network
     restart: unless-stopped
@@ -29,8 +27,6 @@ services:
       - SERVER_PORT=8004
     ports:
       - "8004:8004"
-    depends_on:
-      - mysql
     networks:
       - game-network
     restart: unless-stopped
