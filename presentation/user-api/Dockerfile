@@ -1,34 +1,36 @@
-# Stage 1: Build
+# -------- Stage 1: Build --------
 FROM maven:3.9.5-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Copy pom.xml files to cache dependencies
+# Copy only root pom and module poms to cache dependencies
 COPY pom.xml .
-COPY core/application/pom.xml ./core/application/
-COPY domain/domain/pom.xml ./domain/domain/
-COPY infrastructure/persistence/pom.xml ./infrastructure/persistence/
-COPY infrastructure/security/pom.xml ./infrastructure/security/
-COPY infrastructure/firebase/pom.xml ./infrastructure/firebase/
-COPY infrastructure/external/pom.xml ./infrastructure/external/
-COPY share/shared/pom.xml ./share/shared/
-COPY presentation/admin-api/pom.xml ./presentation/admin-api/
-COPY presentation/user-api/pom.xml ./presentation/user-api/
+COPY domain/domain/pom.xml domain/domain/pom.xml
+COPY core/application/pom.xml core/application/pom.xml
+COPY infrastructure/persistence/pom.xml infrastructure/persistence/pom.xml
+COPY infrastructure/security/pom.xml infrastructure/security/pom.xml
+COPY infrastructure/firebase/pom.xml infrastructure/firebase/pom.xml
+COPY infrastructure/external/pom.xml infrastructure/external/pom.xml
+COPY share/shared/pom.xml share/shared/pom.xml
+COPY presentation/user-api/pom.xml presentation/user-api/pom.xml
 
-# Preload dependencies
-RUN mvn dependency:go-offline -B
+# Pre-download dependencies (build cache friendly)
+RUN mvn -B dependency:go-offline
 
-# Copy full source
-COPY core ./core
-COPY domain ./domain
-COPY infrastructure ./infrastructure
-COPY share ./share
-COPY presentation ./presentation
+# Copy full source for target module and its dependencies
+COPY domain/domain domain/domain
+COPY core/application core/application
+COPY infrastructure/persistence infrastructure/persistence
+COPY infrastructure/security infrastructure/security
+COPY infrastructure/firebase infrastructure/firebase
+COPY infrastructure/external infrastructure/external
+COPY share/shared share/shared
+COPY presentation/user-api presentation/user-api
 
-# Build the entire project
-RUN mvn clean install -DskipTests
+# Build target module only
+RUN mvn -pl presentation/user-api -am clean package -DskipTests
 
-# Stage 2: Runtime
+# -------- Stage 2: Runtime --------
 FROM openjdk:21-jdk-slim
 
 RUN useradd -m appuser
