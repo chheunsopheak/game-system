@@ -39,20 +39,22 @@ class MerchantServiceImpl(
     private val userService: UserService
 ) : MerchantService {
     override fun merchantLogin(request: LoginRequest): ApiResult<MerchantLoginResponse> {
-        val user = userRepository.findByPhone(request.username) ?: userRepository.findByEmail(request.username)
-        ?: userRepository.findByUsername(request.username)
+        val user = userRepository.findByPhone(request.username)
+            ?: userRepository.findByEmail(request.username)
+            ?: userRepository.findByUsername(request.username)
         if (user == null) {
             return ApiResult.notFound("User not found")
         }
 
-        val merchant = merchantRepository.findByUserId(user.id) ?: return ApiResult.notFound("Merchant not found")
+        val merchant = merchantRepository.findByUserId(user.id)
+            ?: return ApiResult.notFound("Merchant not found")
 
         if (!merchant.isActive) {
             return ApiResult.failed(
                 HttpStatus.FORBIDDEN.value(), "Merchant account is not active"
             )
         }
-        val userLogin = authService.adminLogin(request)
+        val userLogin = authService.merchantLogin(request)
         if (!userLogin.success) {
             return ApiResult.error(
                 userLogin.statusCode, userLogin.message ?: "Login failed"
