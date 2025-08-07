@@ -67,8 +67,9 @@ open class SecurityConfig(
         return http.build()
     }
 
+
     @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
+    open fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
             allowCredentials = false
             allowedOrigins = listOf("*")
